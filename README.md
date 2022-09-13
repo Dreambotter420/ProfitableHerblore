@@ -23,7 +23,7 @@ Run this script on a members account with money and watch it burn through the gr
 
 -Custom herb list: Select the herbs that are acceptable to you for the script to process
 
--Bot Mode: Decreases the mouse click interval to clean much faster (default OFF)  pending solution to actually do it
+-Bot Mode: Decreases the mouse click interval to clean much faster (default OFF)
 
 -Druidic Ritual completion: Buys required items then completes quest. Also buys some eyes of newt to boost lvl 3-22 herblore
 
