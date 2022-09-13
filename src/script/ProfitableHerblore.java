@@ -835,11 +835,13 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 				tempHerbPrice = null;
 				putOffer = false;
 			}
-			
+			List<Integer> okUnf = new ArrayList<Integer>();
 			List<Integer> unfFound = new ArrayList<Integer>();
 			for(Herb herb : Herb.values())
 			{
 				if(Bank.contains(herb.unf)) unfFound.add(herb.unf);
+				okUnf.add(herb.unf);
+				okUnf.add(new Item(herb.unf,1).getNotedItemID());
 			}
 			if(unfFound.isEmpty())
 			{
@@ -918,8 +920,7 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 				}
 				continue;
 			}
-			Filter<Item> unfCoinsFilter = i -> i!=null && (unfFound.contains(i.getID()) || i.getID() == coins);
-			
+			Filter<Item> unfCoinsFilter = i -> i!=null && (okUnf.contains(i.getID()) || i.getID() == coins);
 			//have some unf pots to withdraw
 			if(Bank.contains(unfCoinsFilter) && Bank.open())
 			{
