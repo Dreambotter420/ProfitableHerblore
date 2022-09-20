@@ -53,7 +53,6 @@ import org.dreambot.api.wrappers.interactive.Player;
 import org.dreambot.api.wrappers.items.Item;
 import org.dreambot.api.wrappers.widgets.WidgetChild;
 
-import HerbPrice.HerbPrice;
 import script.paint.CustomPaint;
 import script.paint.PaintInfo;
 import script.utilities.API;
@@ -67,7 +66,7 @@ import script.utilities.id;
 
 
 
-@ScriptManifest(name = "Profitable Herblore", author = "Dreambotter420", version = 0.01, category = Category.MISC)
+@ScriptManifest(name = "Profitable Herblore", author = "Dreambotter420", version = 0.04, category = Category.MISC)
 public class ProfitableHerblore extends AbstractScript implements ChatListener, PaintInfo, GameTickListener
 {
 	public static boolean closedGUI = false;
@@ -494,6 +493,7 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 	}
 	public static void sharedOnStart()
 	{
+		
 		Sleep.dt = LocalDateTime.now();
 		runTimer = new Timer(2000000000);
 		Keyboard.setWordsPerMinute((int) Calculations.nextGaussianRandom(150, 30));
@@ -527,7 +527,12 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 		if(botMode)
 		{
 			MethodProvider.log("!!!! BOT MODE ENGAGED !!!!");
-			MouseSettings.setMouseTiming(() -> (int)Calculations.nextGaussianRandom(20,5));
+			MouseSettings.setMouseTiming(() -> 
+			{
+				int tmp = (int)Calculations.nextGaussianRandom(20,5);
+				if(tmp < 5) return 5;
+				return tmp;
+			});
 		}
 		MethodProvider.log("Minimum profit margin: " + minProfitMargin);
 		MethodProvider.log("Maximum quantity of grimy herbs to buy at once: " + maxHerbBuyQty);
@@ -868,9 +873,7 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 						collect();
 						continue;
 					}
-					MethodProvider.log("[sellAllUnf] End - sold all unf pots! Updating profit/hr...");
-					profit = Bank.count(coins) + Inventory.count(coins) - initCoins;
-					profitPerHour = (int) ((double) profit / ((double)runTimer.elapsed() / 3600000));
+					MethodProvider.log("[sellAllUnf] End");
 					if(GrandExchange.isOpen() && isGEActuallyReadyToCollect())
 					{
 						collect();
@@ -1401,9 +1404,11 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 	 * Must call function after price checking!
 	 * Grabs coins, opens GE, cancels all offers if no open slots, collects all offers, then sets buy qty = afforded amount, else capped at 5000 and generated randomly around 4500
 	 */
+	public static Timer profitTimer = null;
 	public static void buyABunchOfHerbs()
 	{
 		currentTask = "Buying a bunch of "+new Item(selectedHerbPrice.herb.grimy,1).getName();
+		
 		if(Bank.contains(coins) || !Inventory.onlyContains(coins))
 		{
 			MethodProvider.log("[buyABunchOfHerbs] Init - Withdrawing coins / depositing everything else");
@@ -1423,7 +1428,20 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 			if(Bank.close()) MethodProvider.sleepUntil(() -> !Bank.isOpen(), Sleep.calculate(2222,2222));
 			return;
 		}
-		MethodProvider.log("[buyABunchOfHerbs] Starting check price of selected herb: " + selectedHerbPrice.herb.toString());
+		MethodProvider.log("[buyABunchOfHerbs] Starting check price of selected herb: " + selectedHerbPrice.herb.toString()+" after seeing out of all grimy/clean/unf! Updating profit/hr...");
+		if(isGEEmpty())
+		{
+			if(initCoins == -1)
+			{
+				initCoins = Bank.count(coins) + Inventory.count(coins);
+			}
+			if(profitTimer == null)
+			{
+				profitTimer = new Timer(2000000000);
+			}
+			profit = Bank.count(coins) + Inventory.count(coins) - initCoins;
+			profitPerHour = (int) ((double) profit / ((double)profitTimer.elapsed() / 3600000));
+		}
 		Timer timer = new Timer((int) Calculations.nextGaussianRandom(80000, 20000));
 		int offerCount = -1;
 		boolean putOffer = false;
@@ -2018,10 +2036,7 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 		{
 			if(Bank.isOpen()) 
 			{
-				if(initCoins == -1)
-				{
-					initCoins = Bank.count(coins) + Inventory.count(coins);
-				}
+				Bank.count(coins);
 			}
 			else clickBank();
 		}
