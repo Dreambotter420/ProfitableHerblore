@@ -22,6 +22,8 @@ import org.dreambot.api.methods.tabs.Tabs;
 import org.dreambot.api.methods.walking.impl.Walking;
 import org.dreambot.api.methods.widget.Widgets;
 import org.dreambot.api.script.ScriptManager;
+import org.dreambot.api.utilities.Logger;
+import org.dreambot.api.utilities.Sleep;
 import org.dreambot.api.utilities.Timer;
 
 import script.ProfitableHerblore;
@@ -79,7 +81,7 @@ public class Walkz {
 		{
 			final int jewelryID = InvEquip.getInvyItem(wearableJewelry);
 			InvEquip.equipItem(jewelryID);
-			MethodProvider.sleepUntil(() -> Equipment.contains(jewelryID), Sleep.calculate(4444, 3333));
+			Sleep.sleepUntil(() -> Equipment.contains(jewelryID), s.calculate(4444, 3333));
 		}
 		if(InvEquip.equipmentContains(wearableJewelry))
 		{
@@ -88,16 +90,16 @@ public class Walkz {
 			else if(GrandExchange.isOpen()) GrandExchange.close();
 			else if(DepositBox.isOpen()) DepositBox.close();
 			Tabs.open(Tab.EQUIPMENT);
-			MethodProvider.sleepUntil(() -> Tabs.isOpen(Tab.EQUIPMENT),Sleep.calculate(3333, 2222));
+			Sleep.sleepUntil(() -> Tabs.isOpen(Tab.EQUIPMENT),s.calculate(3333, 2222));
 			if(Tabs.isOpen(Tab.EQUIPMENT))
 			{
 				if(Equipment.interact(equipSlot, teleName))
 				{
-					MethodProvider.log("Just used Jewelry teleport: " + teleName +" in slot: " + equipSlot);
-					MethodProvider.sleepUntil(() -> ProfitableHerblore.l.isAnimating(),Sleep.calculate(4444,4444));
-					MethodProvider.sleepUntil(() -> !ProfitableHerblore.l.isAnimating(), 
-							() -> ProfitableHerblore.l.isAnimating(), Sleep.calculate(3333,2222),69);
-					Sleep.sleep(111,1111);
+					Logger.log("Just used Jewelry teleport: " + teleName +" in slot: " + equipSlot);
+					Sleep.sleepUntil(() -> ProfitableHerblore.l.isAnimating(),s.calculate(4444,4444));
+					Sleep.sleepUntil(() -> !ProfitableHerblore.l.isAnimating(), 
+							() -> ProfitableHerblore.l.isAnimating(), s.calculate(3333,2222),69);
+					s.sleep(111,1111);
 				}
 			}
 			return true;
@@ -122,7 +124,7 @@ public class Walkz {
 			{
 				if(Inventory.interact(InvEquip.getInvyItem(id.staminas),"Drink"))
 				{
-					Sleep.sleep(69,69);
+					s.sleep(69,69);
 				}
 				return;
 			}
@@ -140,14 +142,14 @@ public class Walkz {
 	 */
 	public static boolean teleport(int tabID, Area teleSpot, long timeout)
 	{
-		MethodProvider.log("Entering generic teletab function");
+		Logger.log("Entering generic teletab function");
 		Timer timer = new Timer(timeout);
 		while(!timer.finished() && Client.getGameState() == GameState.LOGGED_IN
 				&& ScriptManager.getScriptManager().isRunning() && !ScriptManager.getScriptManager().isPaused())
 		{
 			if(teleSpot.contains(ProfitableHerblore.l)) return true;
 			
-			Sleep.sleep(69,69);
+			s.sleep(69,69);
 			
 			//check if have fally tab in invy, use it
 			if(Inventory.contains(tabID))
@@ -157,7 +159,7 @@ public class Walkz {
 				{
 					if(Inventory.interact(tabID, "Break"))
 					{
-						MethodProvider.sleepUntil(() -> teleSpot.contains(ProfitableHerblore.l), () -> ProfitableHerblore.l.isAnimating(), Sleep.calculate(4444,2222),50);
+						Sleep.sleepUntil(() -> teleSpot.contains(ProfitableHerblore.l), () -> ProfitableHerblore.l.isAnimating(), s.calculate(4444,2222),50);
 					}
 				}
 				continue;
@@ -183,7 +185,7 @@ public class Walkz {
 		while(!timer.finished() && Client.getGameState() == GameState.LOGGED_IN
 				&& ScriptManager.getScriptManager().isRunning() && !ScriptManager.getScriptManager().isPaused())
 		{
-			Sleep.sleep(69,69);
+			s.sleep(69,69);
 			//check if already in good GE area
 			if(Locations.clickableGEArea.contains(ProfitableHerblore.l)) return true;
 			//check if within walkable area to GE
@@ -191,7 +193,7 @@ public class Walkz {
 			{
 				if(Walking.shouldWalk(6) && Walking.walk(BankLocation.GRAND_EXCHANGE.getTile()))
 				{
-					Sleep.sleep(666, 1111);
+					s.sleep(666, 1111);
 				}
 				continue;
 			}
@@ -202,7 +204,7 @@ public class Walkz {
 				{
 					if(Equipment.interact(EquipmentSlot.RING, "Grand Exchange"))
 					{
-						MethodProvider.sleepUntil(() -> Locations.teleGE.contains(ProfitableHerblore.l), () -> ProfitableHerblore.l.isAnimating(),Sleep.calculate(3333,2222),50);
+						Sleep.sleepUntil(() -> Locations.teleGE.contains(ProfitableHerblore.l), () -> ProfitableHerblore.l.isAnimating(),s.calculate(3333,2222),50);
 					}
 				}
 				else
@@ -250,7 +252,7 @@ public class Walkz {
 					continue;
 				} 
 				//no options left - go to GE by walking
-				else if(Walking.shouldWalk(6) && Walking.walk(Locations.GE)) Sleep.sleep(666, 666);
+				else if(Walking.shouldWalk(6) && Walking.walk(Locations.GE)) s.sleep(666, 666);
 			}
 			//found item in bank - withdraw it
 			else

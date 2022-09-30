@@ -17,7 +17,6 @@ import org.dreambot.api.Client;
 import org.dreambot.api.ClientSettings;
 import org.dreambot.api.data.GameState;
 import org.dreambot.api.methods.Calculations;
-import org.dreambot.api.methods.MethodProvider;
 import org.dreambot.api.methods.container.impl.Inventory;
 import org.dreambot.api.methods.container.impl.bank.Bank;
 import org.dreambot.api.methods.container.impl.bank.BankMode;
@@ -45,6 +44,8 @@ import org.dreambot.api.script.ScriptManager;
 import org.dreambot.api.script.ScriptManifest;
 import org.dreambot.api.script.listener.ChatListener;
 import org.dreambot.api.script.listener.GameTickListener;
+import org.dreambot.api.utilities.Logger;
+import org.dreambot.api.utilities.Sleep;
 import org.dreambot.api.utilities.Timer;
 import org.dreambot.api.utilities.impl.Condition;
 import org.dreambot.api.wrappers.interactive.GameObject;
@@ -59,7 +60,7 @@ import script.utilities.API;
 import script.utilities.Combatz;
 import script.utilities.InvEquip;
 import script.utilities.Locations;
-import script.utilities.Sleep;
+import script.utilities.s;
 import script.utilities.Walkz;
 import script.utilities.id;
 
@@ -304,7 +305,7 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 			}
 			
 			closedGUI = true;
-			MethodProvider.log("Starting after closing GUI!");
+			Logger.log("Starting after closing GUI!");
 			frame.dispose();
 		});
 		StartButton.setForeground(Color.BLACK);
@@ -334,7 +335,7 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 	@Override
 	public void onStart()
 	{
-		MethodProvider.log("OnStart Script!");
+		Logger.log("OnStart Script!");
 		try {
 			SwingUtilities.invokeAndWait(() -> {
 			    createGUI();
@@ -347,7 +348,7 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 	public void onStart(String[] i)
 	{
 		closedGUI = true;
-		MethodProvider.log("OnStart Script quickstart parameters!");
+		Logger.log("OnStart Script quickstart parameters!");
 		for(String param : i)
 		{
 			String para = param.toLowerCase().replace(" ","");
@@ -356,74 +357,74 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 				String number = para.split("=")[1];
 				if(!number.matches("[0-9]+")) 
 				{
-					MethodProvider.log("Ignoring found -param due to not number: " + para);
+					Logger.log("Ignoring found -param due to not number: " + para);
 					continue;
 				}
 				maxHerbBuyQty = Integer.parseInt(number);
-				MethodProvider.log("Setting maximum herb buy quantity: "+maxHerbBuyQty);
+				Logger.log("Setting maximum herb buy quantity: "+maxHerbBuyQty);
 			}
 			if(para.contains("profitmargin="))
 			{
 				String number = para.split("=")[1];
 				if(!number.matches("[0-9]+")) 
 				{
-					MethodProvider.log("Ignoring found -param due to not number: " + para);
+					Logger.log("Ignoring found -param due to not number: " + para);
 					continue;
 				}
 				minProfitMargin = Integer.parseInt(number);
-				MethodProvider.log("Minimum profit margin per grimy -> unf herb: "+minProfitMargin+"gp");
+				Logger.log("Minimum profit margin per grimy -> unf herb: "+minProfitMargin+"gp");
 			}
 			if(para.contains("undercutsell="))
 			{
 				String number = para.split("=")[1];
 				if(!number.matches("[0-9]+")) 
 				{
-					MethodProvider.log("Ignoring found -param due to not number: " + para);
+					Logger.log("Ignoring found -param due to not number: " + para);
 					continue;
 				}
 				undercuttingSellUnf = Integer.parseInt(number);
-				MethodProvider.log("Undercutting sell unf by: "+undercuttingSellUnf+"gp");
+				Logger.log("Undercutting sell unf by: "+undercuttingSellUnf+"gp");
 			}
 			if(para.contains("undercutbuy="))
 			{
 				String number = para.split("=")[1];
 				if(!number.matches("[0-9]+")) 
 				{
-					MethodProvider.log("Ignoring found -param due to not number: " + para);
+					Logger.log("Ignoring found -param due to not number: " + para);
 					continue;
 				}
 				undercuttingBuyGrimy = Integer.parseInt(number);
-				MethodProvider.log("Undercutting sell unf by: "+undercuttingBuyGrimy+"gp");
+				Logger.log("Undercutting sell unf by: "+undercuttingBuyGrimy+"gp");
 			}
 			if(para.contains("xpmode="))
 			{
 				String bool = para.split("=")[1];
 				if(bool.contains("true") || bool.contains("on"))
 				{
-					MethodProvider.log("Setting Bot Mode: ON");
+					Logger.log("Setting Bot Mode: ON");
 					xpMode = true;
 				}
 				else if(bool.contains("false") || bool.contains("off"))
 				{
-					MethodProvider.log("Setting Bot Mode: OFF");
+					Logger.log("Setting Bot Mode: OFF");
 					xpMode = true;
 				}
-				else MethodProvider.log("Ignoring found -param due to not true/false: " + para);
+				else Logger.log("Ignoring found -param due to not true/false: " + para);
 			}
 			if(para.contains("botmode="))
 			{
 				String bool = para.split("=")[1];
 				if(bool.contains("true") || bool.contains("on"))
 				{
-					MethodProvider.log("Setting Bot Mode: ON");
+					Logger.log("Setting Bot Mode: ON");
 					botMode = true;
 				}
 				else if(bool.contains("false") || bool.contains("off"))
 				{
-					MethodProvider.log("Setting Bot Mode: OFF");
+					Logger.log("Setting Bot Mode: OFF");
 					botMode = true;
 				}
-				else MethodProvider.log("Ignoring found -param due to not true/false: " + para);
+				else Logger.log("Ignoring found -param due to not true/false: " + para);
 			}
 
 			if(para.contains("herbs{"))
@@ -456,10 +457,10 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 		else if(herbName.contains("torstol")) useTorstol = true;
 		else 
 		{
-			MethodProvider.log("Ignoring quickstart param herb name: " + herbName);
+			Logger.log("Ignoring quickstart param herb name: " + herbName);
 			return;
 		}
-		MethodProvider.log("OK to use " + herbName);
+		Logger.log("OK to use " + herbName);
 	}
 	public static void setAllHerbsTrue()
 	{
@@ -494,7 +495,7 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 	public static void sharedOnStart()
 	{
 		
-		Sleep.dt = LocalDateTime.now();
+		s.dt = LocalDateTime.now();
 		runTimer = new Timer(2000000000);
 		Keyboard.setWordsPerMinute((int) Calculations.nextGaussianRandom(150, 30));
 		InvEquip.initializeIntLists();
@@ -514,19 +515,19 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 		if(useTorstol) acceptableHerbs.add(Herb.TORSTOL);
 		if(acceptableHerbs.isEmpty())
 		{
-			MethodProvider.log("No acceptable herbs :-( Script stop...");
+			Logger.log("No acceptable herbs :-( Script stop...");
 			ScriptManager.getScriptManager().stop();
 			return;
 		}
 		for(Herb herb : acceptableHerbs)
 		{
-			MethodProvider.log("OK to use " + herb.toString());
+			Logger.log("OK to use " + herb.toString());
 		}
-		MethodProvider.log("XP Mode: " + xpMode);
-		MethodProvider.log("Bot Mode: " + botMode);
+		Logger.log("XP Mode: " + xpMode);
+		Logger.log("Bot Mode: " + botMode);
 		if(botMode)
 		{
-			MethodProvider.log("!!!! BOT MODE ENGAGED !!!!");
+			Logger.log("!!!! BOT MODE ENGAGED !!!!");
 			MouseSettings.setMouseTiming(() -> 
 			{
 				int tmp = (int)Calculations.nextGaussianRandom(20,5);
@@ -534,10 +535,10 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 				return tmp;
 			});
 		}
-		MethodProvider.log("Minimum profit margin: " + minProfitMargin);
-		MethodProvider.log("Maximum quantity of grimy herbs to buy at once: " + maxHerbBuyQty);
-		MethodProvider.log("Undercut sell unf potions by: " + undercuttingSellUnf+"gp");
-		MethodProvider.log("Undercut buy grimy herbs by: " + undercuttingBuyGrimy+"gp");
+		Logger.log("Minimum profit margin: " + minProfitMargin);
+		Logger.log("Maximum quantity of grimy herbs to buy at once: " + maxHerbBuyQty);
+		Logger.log("Undercut sell unf potions by: " + undercuttingSellUnf+"gp");
+		Logger.log("Undercut buy grimy herbs by: " + undercuttingBuyGrimy+"gp");
 		initialized = true;
 	}
 	
@@ -549,13 +550,13 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 	@Override
 	public void onExit()
 	{
-		MethodProvider.log("~~~~Exiting~~~~");
-		MethodProvider.log("Total runtime: " + Timer.formatTime(runTimer.elapsed()));
-		MethodProvider.log("Final cleans/hr " + cleansPerHour);
-		MethodProvider.log("Total cleans " + cleans);
-		MethodProvider.log("Final profit/hr " + profitPerHour);
-		MethodProvider.log("Net profit: " + profit);
-		MethodProvider.log("~~~~~~~~~~~~~~~~");
+		Logger.log("~~~~Exiting~~~~");
+		Logger.log("Total runtime: " + Timer.formatTime(runTimer.elapsed()));
+		Logger.log("Final cleans/hr " + cleansPerHour);
+		Logger.log("Total cleans " + cleans);
+		Logger.log("Final profit/hr " + profitPerHour);
+		Logger.log("Net profit: " + profit);
+		Logger.log("~~~~~~~~~~~~~~~~");
 		MouseSettings.resetMouseTimings();
 	}
 	//selectedHerb
@@ -575,15 +576,15 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 		if(Client.getGameState() == GameState.LOADING || 
         		Client.getGameState() == GameState.GAME_LOADING)
 		{
-			MethodProvider.sleepUntil(() -> (Client.getGameState() != GameState.LOADING && 
+			Sleep.sleepUntil(() -> (Client.getGameState() != GameState.LOADING && 
         		Client.getGameState() != GameState.GAME_LOADING), 10000);
-			Sleep.sleep(1111, 1111);
+			s.sleep(1111, 1111);
 			return false;
 		}
 		else if(Client.getGameState() != GameState.LOGGED_IN)
 		{
-			MethodProvider.sleepUntil(() -> Client.getGameState() == GameState.LOGGED_IN, 7000);
-			Sleep.sleep(1111, 1111);
+			Sleep.sleepUntil(() -> Client.getGameState() == GameState.LOGGED_IN, 7000);
+			s.sleep(1111, 1111);
 			return false;
 		}
 		return true;
@@ -603,27 +604,27 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 	{
 		if(!closedGUI) return (int) Calculations.nextGaussianRandom(500, 222);
 		if(!initialized) sharedOnStart();
-		if(!loggedNLoaded()) return Sleep.calculate(1111, 1111);
+		if(!loggedNLoaded()) return s.calculate(1111, 1111);
 		l = Players.getLocal();
 		if(!completedDruidicRitual())
 		{
 			doDruidicRitual();
-			return Sleep.calculate(420,696);
+			return s.calculate(420,696);
 		}
 		if(GrandExchange.isOpen() && isGEActuallyReadyToCollect())
 		{
-			MethodProvider.log("Have availability to collect GE!");
+			Logger.log("Have availability to collect GE!");
 			collect();
-			return Sleep.calculate(111, 420);
+			return s.calculate(111, 420);
 		}
 		
 		//check if we have chosen an herb to process already
 		if(selectedHerbPrice == null)
 		{
 			//choose random existing one, or sell all herbs and then price check all available 
-			if(checkForAvailableExistingHerbs()) return Sleep.calculate(420,696);
+			if(checkForAvailableExistingHerbs()) return s.calculate(420,696);
 			priceCheck();
-			return Sleep.calculate(420, 696);
+			return s.calculate(420, 696);
 		}
 		final int grimy = selectedHerbPrice.herb.grimy;
 		final int clean = selectedHerbPrice.herb.clean;
@@ -639,19 +640,19 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 		if(bankVials <= 0)
 		{
 			buyMoreVials();
-			return Sleep.calculate(420, 696);
+			return s.calculate(420, 696);
 		}
 		//check if nothing left to process of selectedHerb
 		if(totalHerbCount <= 0)
 		{
-			if(checkForAvailableExistingHerbs()) return Sleep.calculate(420,696);
+			if(checkForAvailableExistingHerbs()) return s.calculate(420,696);
 			if(needSelectedHerbPriceCheck)
 			{
 				priceCheck();
-				return Sleep.calculate(420, 696);
+				return s.calculate(420, 696);
 			}
 			buyABunchOfHerbs();
-			return Sleep.calculate(420, 696);
+			return s.calculate(420, 696);
 		}
 		
 		
@@ -662,8 +663,8 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 					g.getName().equals("Grand Exchange booth") && 
 					g.hasAction("Bank");
 			GameObject bank = GameObjects.closest(bankFilter);
-			if(bank != null && bank.interact("Bank")) MethodProvider.sleepUntil(() -> Bank.isOpen(),Sleep.calculate(2222, 2222));
-			return Sleep.calculate(111, 420);
+			if(bank != null && bank.interact("Bank")) Sleep.sleepUntil(() -> Bank.isOpen(),s.calculate(2222, 2222));
+			return s.calculate(111, 420);
 		}
 		cleansPerHour = (int) ((double) cleans / ((double)runTimer.elapsed() / 3600000));
 		
@@ -672,16 +673,16 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 			if(clean == guam && Inventory.count(unf) > 0 && Bank.count(eyeOfNewt) > 0)
 			{
 				currentTask = "Withdrawing 14 eyes of newt";
-				if(Bank.withdraw(eyeOfNewt,14)) Sleep.sleep(69, 111);
+				if(Bank.withdraw(eyeOfNewt,14)) s.sleep(69, 111);
 				Bank.close();
-				MethodProvider.sleepUntil(() -> Inventory.contains(eyeOfNewt), Sleep.calculate(3333, 3333));
-				return Sleep.calculate(69, 696);
+				Sleep.sleepUntil(() -> Inventory.contains(eyeOfNewt), s.calculate(3333, 3333));
+				return s.calculate(69, 696);
 			}
 			currentTask = "Depositing all items";
-			MethodProvider.log("Depositing all items");
+			Logger.log("Depositing all items");
 			if(Bank.depositAllItems()) 
 			{
-				Sleep.sleep(69, 111);
+				s.sleep(69, 111);
 			}
 			if(bankGrimys > 0) 
 			{
@@ -691,18 +692,18 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 					if(Bank.getDefaultQuantity() != BankQuantitySelection.X)
 					{
 						if(Bank.setDefaultQuantity(BankQuantitySelection.X)) tickSleep();
-						return Sleep.calculate(69, 696);
+						return s.calculate(69, 696);
 					}
-					if(Bank.withdraw(grimy,14)) Sleep.sleep(69, 111);
-					if(Bank.withdraw(vial,14)) Sleep.sleep(69, 111);
+					if(Bank.withdraw(grimy,14)) s.sleep(69, 111);
+					if(Bank.withdraw(vial,14)) s.sleep(69, 111);
 					Bank.close();
-					MethodProvider.sleepUntil(() -> Inventory.contains(grimy) && Inventory.contains(vial), Sleep.calculate(3333, 3333));
-					return Sleep.calculate(69, 696);
+					Sleep.sleepUntil(() -> Inventory.contains(grimy) && Inventory.contains(vial), s.calculate(3333, 3333));
+					return s.calculate(69, 696);
 				}
-				if(Bank.withdrawAll(grimy)) Sleep.sleep(69, 111);
-				MethodProvider.sleepUntil(() -> Inventory.contains(grimy), Sleep.calculate(3333, 3333));
+				if(Bank.withdrawAll(grimy)) s.sleep(69, 111);
+				Sleep.sleepUntil(() -> Inventory.contains(grimy), s.calculate(3333, 3333));
 				Bank.close();
-				return Sleep.calculate(69, 696);
+				return s.calculate(69, 696);
 			}
 			if(bankCleans > 0)
 			{
@@ -711,17 +712,17 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 					if(Bank.getDefaultQuantity() != BankQuantitySelection.X)
 					{
 						if(Bank.setDefaultQuantity(BankQuantitySelection.X)) tickSleep();
-						return Sleep.calculate(69, 696);
+						return s.calculate(69, 696);
 					}
-					if(Bank.withdraw(clean,14)) Sleep.sleep(69, 111);
-					if(Bank.withdraw(vial,14)) Sleep.sleep(69, 111);
-					MethodProvider.sleepUntil(() -> Inventory.contains(clean) && Inventory.contains(vial), Sleep.calculate(3333, 3333));
+					if(Bank.withdraw(clean,14)) s.sleep(69, 111);
+					if(Bank.withdraw(vial,14)) s.sleep(69, 111);
+					Sleep.sleepUntil(() -> Inventory.contains(clean) && Inventory.contains(vial), s.calculate(3333, 3333));
 					Bank.close();
-					return Sleep.calculate(69, 696);
+					return s.calculate(69, 696);
 				}
 			}
-			MethodProvider.sleepUntil(() -> Inventory.isEmpty(), Sleep.calculate(3333, 3333));
-			Sleep.sleep(696, 1111);
+			Sleep.sleepUntil(() -> Inventory.isEmpty(), s.calculate(3333, 3333));
+			s.sleep(696, 1111);
 			if(Inventory.isEmpty())
 			{
 				final int vials2 = Bank.count(vial);
@@ -729,10 +730,10 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 				final int grimys2 = Bank.count(grimy);
 				if(vials2 != bankVials || 
 						cleans2 != bankCleans || 
-						grimys2 != bankGrimys) return Sleep.calculate(111,111);
+						grimys2 != bankGrimys) return s.calculate(111,111);
 				return -1;
 			}
-			return Sleep.calculate(111, 696);
+			return s.calculate(111, 696);
 		}
 		if(Inventory.contains(grimy))
 		{
@@ -744,13 +745,13 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 				if(Inventory.slotInteract(i.getSlot(), "Clean")) 
 				{
 					cleans++;
-					MethodProvider.sleep((int) Calculations.nextGaussianRandom(50, 33));
+					Sleep.sleep((int) Calculations.nextGaussianRandom(50, 33));
 				}
-				else if(i.interact("Clean")) Sleep.sleep(42,69);
+				else if(i.interact("Clean")) s.sleep(42,69);
 			}
 			if(Inventory.contains(vial))
 			{
-				MethodProvider.sleepUntil(() -> Inventory.contains(clean), Sleep.calculate(2222, 2222));
+				Sleep.sleepUntil(() -> Inventory.contains(clean), s.calculate(2222, 2222));
 			}
 		}
 		
@@ -760,20 +761,20 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 			if(Inventory.contains(vial) && Inventory.contains(clean)) c = () -> !l.exists() || !Inventory.contains(clean) || Dialogues.canContinue();
 			else c = () -> !l.exists() || !Inventory.contains(eyeOfNewt) || Dialogues.canContinue();
 			Keyboard.typeSpecialKey(32);
-			MethodProvider.sleepUntil(c,() -> l.isAnimating(),Sleep.calculate(2222, 2222),69);
-			return Sleep.calculate(111, 1111);
+			Sleep.sleepUntil(c,() -> l.isAnimating(),s.calculate(2222, 2222),69);
+			return s.calculate(111, 1111);
 		}
 		Condition itemProcessing = () -> ItemProcessing.isOpen();
-		int sleepTimeout = Sleep.calculate(3333, 3333);
+		int sleepTimeout = s.calculate(3333, 3333);
 		if(Inventory.contains(vial) && Inventory.contains(clean))
 		{
 			currentTask = "Using vial -> clean";
 			if(Inventory.get(vial).useOn(clean)) 
 			{
 				Keyboard.holdSpace(itemProcessing, sleepTimeout);
-				MethodProvider.sleepUntil(itemProcessing, sleepTimeout);
+				Sleep.sleepUntil(itemProcessing, sleepTimeout);
 			}
-			return Sleep.calculate(111, 1111);
+			return s.calculate(111, 1111);
 		}
 		if(Inventory.contains(eyeOfNewt) && Inventory.contains(unf))
 		{
@@ -781,12 +782,12 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 			if(Inventory.get(unf).useOn(eyeOfNewt))
 			{
 				Keyboard.holdSpace(itemProcessing, sleepTimeout);
-				MethodProvider.sleepUntil(itemProcessing, sleepTimeout);
+				Sleep.sleepUntil(itemProcessing, sleepTimeout);
 			}
-			return Sleep.calculate(111, 1111);
+			return s.calculate(111, 1111);
 		}
 		clickBank();
-		return Sleep.calculate(111, 1111);
+		return s.calculate(111, 1111);
 	}
 	public static int profitPerHour = 0;
 	public static Timer lastUnfSellTimer;
@@ -802,7 +803,7 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 	{
 		
 		currentTask = "Selling all unf potions";
-		MethodProvider.log("[sellAllUnf] Start");
+		Logger.log("[sellAllUnf] Start");
 		
 		needSelectedHerbPriceCheck = true;
 		if(!checkedBank()) return;
@@ -813,7 +814,7 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 		boolean putOffer = false;
 		while(!timer.finished() && !ScriptManager.getScriptManager().isPaused() && ScriptManager.getScriptManager().isRunning())
 		{
-			Sleep.sleep(420, 696);
+			s.sleep(420, 696);
 			if(putOffer)
 			{
 				if(lastUnfSellTimer == null)
@@ -833,7 +834,7 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 					}
 					if(!completedGEOfferWithQty(randUnfID,randUnfOfferCount,false))
 					{
-						Sleep.sleep(111, 1111);
+						s.sleep(111, 1111);
 					}
 					continue;
 				}
@@ -850,7 +851,7 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 			}
 			if(unfFound.isEmpty())
 			{
-				MethodProvider.log("Bank empty of unf!");
+				Logger.log("Bank empty of unf!");
 				if(Bank.isOpen())
 				{
 					if(Bank.contains(coins)) 
@@ -858,7 +859,7 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 						Bank.withdrawAll(coins);
 						continue;
 					}
-					if(Bank.close()) MethodProvider.sleepUntil(() -> !Bank.isOpen(), Sleep.calculate(2222, 2222));
+					if(Bank.close()) Sleep.sleepUntil(() -> !Bank.isOpen(), s.calculate(2222, 2222));
 					continue;
 				}
 				for(Herb herb : Herb.values())
@@ -873,7 +874,7 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 						collect();
 						continue;
 					}
-					MethodProvider.log("[sellAllUnf] End");
+					Logger.log("[sellAllUnf] End");
 					if(GrandExchange.isOpen() && isGEActuallyReadyToCollect())
 					{
 						collect();
@@ -900,7 +901,7 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 				if(GrandExchange.getFirstOpenSlot() == -1)
 				{
 					GrandExchange.cancelAll();
-					MethodProvider.sleepUntil(() -> GrandExchange.isReadyToCollect(),Sleep.calculate(2222, 2222));
+					Sleep.sleepUntil(() -> GrandExchange.isReadyToCollect(),s.calculate(2222, 2222));
 					continue;
 				}
 				if(isGEActuallyReadyToCollect())
@@ -912,21 +913,26 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 				int sellPrice = tempHerbPrice.unfLow - undercuttingSellUnf;
 				if(sellPrice <= 1) 
 				{
-					MethodProvider.log("Not selling unf with unfLow price: "+ sellPrice);
+					Logger.log("Not selling unf with unfLow price: "+ sellPrice);
 				}
 				randUnfOfferCount = Inventory.count(randUnfID) + Inventory.count(new Item(randUnfID,1).getNotedItemID());
 				if(GrandExchange.sellItem(new Item(randUnfID,1).getName(), randUnfOfferCount, sellPrice))
 				{
-					MethodProvider.log("Put sell offer for item: " + new Item(randUnfID,1).getName() + " in qty: " + randUnfOfferCount + " at pricePer: " +sellPrice);
+					Logger.log("Put sell offer for item: " + new Item(randUnfID,1).getName() + " in qty: " + randUnfOfferCount + " at pricePer: " +sellPrice);
 					putOffer = true;
-					MethodProvider.sleepUntil(() -> isGEActuallyReadyToCollect(), Sleep.calculate(2222, 2222));
+					Sleep.sleepUntil(() -> isGEActuallyReadyToCollect(), s.calculate(2222, 2222));
 				}
 				continue;
 			}
 			Filter<Item> unfCoinsFilter = i -> i!=null && (okUnf.contains(i.getID()) || i.getID() == coins);
 			//have some unf pots to withdraw
-			if(Bank.contains(unfCoinsFilter) && Bank.open())
+			if(Bank.contains(unfCoinsFilter))
 			{
+				if(!Bank.isOpen())
+				{
+					Bank.open();
+					continue;
+				}
 				if(!Inventory.isEmpty() && !Inventory.onlyContains(unfCoinsFilter))
 				{
 					Bank.depositAllExcept(unfCoinsFilter);
@@ -940,7 +946,7 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 				Bank.setWithdrawMode(BankMode.NOTE);
 			}
 		}
-		MethodProvider.log("[sellAllUnf] Timeout!");
+		Logger.log("[sellAllUnf] Timeout!");
 		return;
 	}
 	/**
@@ -949,7 +955,7 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 	public static HerbPrice priceCheck1Unf(Herb herb)
 	{
 		currentTask = "Checking sell price of 1 "+new Item(herb.unf,1).getName();
-		MethodProvider.log("[priceCheck1UnfHerb] Starting check price: " + new Item(herb.unf,1).getName());
+		Logger.log("[priceCheck1UnfHerb] Starting check price: " + new Item(herb.unf,1).getName());
 		
 		//check bank, get coins, deposit everything else
 		boolean putOffer = false;
@@ -960,7 +966,7 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 		{
 			//need to buy grimy, then sell grimy, then buy unf, sell unf,
 			//then check history and search from top down for item id and qty = 1 of sold
-			Sleep.sleep(69, 420);
+			s.sleep(69, 420);
 			if(soldUnf)
 			{
 				if(isGEHistoryOpen())
@@ -968,11 +974,11 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 					final int soldUnfFor = getGEHistoryMostRecentTradePrice(herb.unf, false);
 					if(soldUnfFor == -1) 
 					{
-						MethodProvider.log("Failed to observe existing sold amount for unf potion! Trying again...");
+						Logger.log("Failed to observe existing sold amount for unf potion! Trying again...");
 						soldUnf = false;
 						continue;
 					}
-					MethodProvider.log("Found unf " + herb.toString() + " with sell price: " + soldUnfFor);
+					Logger.log("Found unf " + herb.toString() + " with sell price: " + soldUnfFor);
 					return new HerbPrice(herb,0,0,soldUnfFor,0);
 				}
 				if(!GrandExchange.isOpen())
@@ -982,8 +988,8 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 					{
 						if(GETeller.interact("History"))
 						{
-							MethodProvider.sleepUntil(() -> !l.exists() || isGEHistoryOpen(),
-									()->l.isMoving(),Sleep.calculate(2222,2222),69);
+							Sleep.sleepUntil(() -> !l.exists() || isGEHistoryOpen(),
+									()->l.isMoving(),s.calculate(2222,2222),69);
 						}
 					}
 					continue;
@@ -998,7 +1004,7 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 				{
 					if(historyButton.interact("History"))
 					{
-						MethodProvider.sleepUntil(() -> isGEHistoryOpen(), Sleep.calculate(2222, 2222));
+						Sleep.sleepUntil(() -> isGEHistoryOpen(), s.calculate(2222, 2222));
 					}
 					continue;
 				}
@@ -1015,7 +1021,7 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 						{
 							if(exchangeButton.interact("Exchange"))
 							{
-								MethodProvider.sleepUntil(GrandExchange::isOpen, Sleep.calculate(2222, 2222));
+								Sleep.sleepUntil(GrandExchange::isOpen, s.calculate(2222, 2222));
 							}
 						}
 						continue;
@@ -1040,12 +1046,12 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 				if(GrandExchange.sellItem(new Item(herb.unf,1).getName(), 1, 1))
 				{
 					putOffer = true;
-					MethodProvider.sleepUntil(() -> isGEActuallyReadyToCollect(), Sleep.calculate(2222, 2222));
+					Sleep.sleepUntil(() -> isGEActuallyReadyToCollect(), s.calculate(2222, 2222));
 				}
 				continue;
 			}
 		}
-		MethodProvider.log("Timeout after 3 minutes of unf sold pricecheck!");
+		Logger.log("Timeout after 3 minutes of unf sold pricecheck!");
 		return null;
 	}
 	/**
@@ -1057,7 +1063,7 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 		
 		//check bank, get coins, deposit everything else
 		if(!checkedBank()) return;
-		MethodProvider.log("[priceCheckSelectedHerb] Starting check price of selected herb: " + selectedHerbPrice.herb.toString());
+		Logger.log("[priceCheckSelectedHerb] Starting check price of selected herb: " + selectedHerbPrice.herb.toString());
 		
 		int grimyOfferPrice = (int) Calculations.nextGaussianRandom((LivePrices.getHigh(selectedHerbPrice.herb.grimy) * 5), 50);
 		if(grimyOfferPrice >= 20000) grimyOfferPrice = (int) Calculations.nextGaussianRandom(20000, 1000);
@@ -1075,7 +1081,7 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 		{
 			//need to buy grimy, then sell grimy, then buy unf, sell unf,
 			//then check history and search from top down for item id and qty = 1 of sold
-			Sleep.sleep(69, 420);
+			s.sleep(69, 420);
 			
 			if(boughtGrimy && soldGrimy && boughtUnf && soldUnf)
 			{
@@ -1087,7 +1093,7 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 					final int soldUnfFor = getGEHistoryMostRecentTradePrice(selectedHerbPrice.herb.unf, false);
 					if(boughtGrimyFor == -1 || soldGrimyFor == -1 || boughtUnfFor == -1 || soldUnfFor == -1) 
 					{
-						MethodProvider.log("Failed to observe existing bought/sold qtys for grimy/unf herb! Trying again...");
+						Logger.log("Failed to observe existing bought/sold qtys for grimy/unf herb! Trying again...");
 						boughtGrimy = soldGrimy = boughtUnf = soldUnf = false;
 						continue;
 					}
@@ -1095,12 +1101,12 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 					foundHerbPrice.printHerbPrices();
 					if(foundHerbPrice.profitMargin < minProfitMargin)
 					{
-						MethodProvider.log("Profit margin of less than "+minProfitMargin+"gp! Price-checking all herbs again...");
+						Logger.log("Profit margin of less than "+minProfitMargin+"gp! Price-checking all herbs again...");
 						selectedHerbPrice = null;
 						return;
 					}
 					selectedHerbPrice = foundHerbPrice;
-					MethodProvider.log("Setting herb to process: " + selectedHerbPrice.herb.toString());
+					Logger.log("Setting herb to process: " + selectedHerbPrice.herb.toString());
 					needSelectedHerbPriceCheck = false;
 					return;
 				}
@@ -1111,8 +1117,8 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 					{
 						if(GETeller.interact("History"))
 						{
-							MethodProvider.sleepUntil(() -> !l.exists() || isGEHistoryOpen(),
-									()->l.isMoving(),Sleep.calculate(2222,2222),69);
+							Sleep.sleepUntil(() -> !l.exists() || isGEHistoryOpen(),
+									()->l.isMoving(),s.calculate(2222,2222),69);
 						}
 					}
 					continue;
@@ -1127,7 +1133,7 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 				{
 					if(historyButton.interact("History"))
 					{
-						MethodProvider.sleepUntil(() -> isGEHistoryOpen(), Sleep.calculate(2222, 2222));
+						Sleep.sleepUntil(() -> isGEHistoryOpen(), s.calculate(2222, 2222));
 					}
 					continue;
 				}
@@ -1147,7 +1153,7 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 						}
 						if(Bank.withdrawAll(coins))
 						{
-							MethodProvider.sleepUntil(() -> !Bank.contains(coins), Sleep.calculate(2222, 2222));
+							Sleep.sleepUntil(() -> !Bank.contains(coins), s.calculate(2222, 2222));
 						}
 						continue;
 					}
@@ -1160,7 +1166,7 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 							{
 								if(exchangeButton.interact("Exchange"))
 								{
-									MethodProvider.sleepUntil(GrandExchange::isOpen, Sleep.calculate(2222, 2222));
+									Sleep.sleepUntil(GrandExchange::isOpen, s.calculate(2222, 2222));
 								}
 							}
 							continue;
@@ -1173,7 +1179,7 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 						continue;
 					}
 					if(!isGEEmpty()) continue;
-					MethodProvider.log("No more coins! Need more than 20k...");
+					Logger.log("No more coins! Need more than 20k...");
 					continue;
 				}
 				if(!GrandExchange.isOpen())
@@ -1185,7 +1191,7 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 						{
 							if(exchangeButton.interact("Exchange"))
 							{
-								MethodProvider.sleepUntil(GrandExchange::isOpen, Sleep.calculate(2222, 2222));
+								Sleep.sleepUntil(GrandExchange::isOpen, s.calculate(2222, 2222));
 							}
 						}
 						continue;
@@ -1205,7 +1211,7 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 				if(GrandExchange.getFirstOpenSlot() == -1)
 				{
 					GrandExchange.cancelAll();
-					MethodProvider.sleepUntil(() -> GrandExchange.isReadyToCollect(),Sleep.calculate(2222, 2222));
+					Sleep.sleepUntil(() -> GrandExchange.isReadyToCollect(),s.calculate(2222, 2222));
 					continue;
 				}
 				if(isGEActuallyReadyToCollect())
@@ -1216,7 +1222,7 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 				if(GrandExchange.buyItem(selectedHerbPrice.herb.grimy, 1, grimyOfferPrice))
 				{
 					putOffer = true;
-					MethodProvider.sleepUntil(() -> isGEActuallyReadyToCollect(), Sleep.calculate(2222, 2222));
+					Sleep.sleepUntil(() -> isGEActuallyReadyToCollect(), s.calculate(2222, 2222));
 				}
 				continue;
 			}
@@ -1244,7 +1250,7 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 				if(GrandExchange.sellItem(new Item(selectedHerbPrice.herb.grimy,1).getName(), 1, 1))
 				{
 					putOffer = true;
-					MethodProvider.sleepUntil(() -> isGEActuallyReadyToCollect(), Sleep.calculate(2222, 2222));
+					Sleep.sleepUntil(() -> isGEActuallyReadyToCollect(), s.calculate(2222, 2222));
 				}
 				continue;
 			}
@@ -1272,7 +1278,7 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 				if(GrandExchange.buyItem(selectedHerbPrice.herb.unf, 1, unfOfferPrice))
 				{
 					putOffer = true;
-					MethodProvider.sleepUntil(() -> isGEActuallyReadyToCollect(), Sleep.calculate(2222, 2222));
+					Sleep.sleepUntil(() -> isGEActuallyReadyToCollect(), s.calculate(2222, 2222));
 				}
 				continue;
 			}
@@ -1300,12 +1306,12 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 				if(GrandExchange.sellItem(new Item(selectedHerbPrice.herb.unf,1).getName(), 1, 1))
 				{
 					putOffer = true;
-					MethodProvider.sleepUntil(() -> isGEActuallyReadyToCollect(), Sleep.calculate(2222, 2222));
+					Sleep.sleepUntil(() -> isGEActuallyReadyToCollect(), s.calculate(2222, 2222));
 				}
 				continue;
 			}
 		}
-		MethodProvider.log("Timeout after 3 minutes of pricecheck selected herb! Resetting selected herb...");
+		Logger.log("Timeout after 3 minutes of pricecheck selected herb! Resetting selected herb...");
 		selectedHerbPrice = null;
 	}
 	public static void buyMoreVials()
@@ -1320,7 +1326,7 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 		}
 		if(Bank.contains(coins) || !Inventory.onlyContains(coins))
 		{
-			MethodProvider.log("[buyMoreVials] Init - Withdrawing coins / depositing everything else");
+			Logger.log("[buyMoreVials] Init - Withdrawing coins / depositing everything else");
 			if(!Bank.isOpen())
 			{
 				clickBank();
@@ -1328,24 +1334,24 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 			}
 			if(Bank.depositAllExcept(995) && Bank.withdrawAll(coins))
 			{
-				MethodProvider.sleepUntil(() -> !Bank.contains(coins),Sleep.calculate(2222, 2222));
+				Sleep.sleepUntil(() -> !Bank.contains(coins),s.calculate(2222, 2222));
 			}
 			return;
 		}
 		
 		if(Bank.isOpen())
 		{
-			if(Bank.close()) MethodProvider.sleepUntil(() -> !Bank.isOpen(), Sleep.calculate(2222,2222));
+			if(Bank.close()) Sleep.sleepUntil(() -> !Bank.isOpen(), s.calculate(2222,2222));
 			return;
 		}
 		
-		MethodProvider.log("[buyMoreVials] Start");
+		Logger.log("[buyMoreVials] Start");
 		
 		Timer timer = new Timer(180000);
 		boolean putOffer = false;
 		while(!timer.finished() && !ScriptManager.getScriptManager().isPaused() && ScriptManager.getScriptManager().isRunning())
 		{
-			Sleep.sleep(420, 696);
+			s.sleep(420, 696);
 			if(!GrandExchange.isOpen())
 			{
 				GrandExchange.open();
@@ -1359,14 +1365,14 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 					collect();
 					continue;
 				}
-				MethodProvider.log("Waiting for offer to complete...");
-				Sleep.sleep(2222, 2222);
+				Logger.log("Waiting for offer to complete...");
+				s.sleep(2222, 2222);
 				continue;
 			}
 			if(GrandExchange.getFirstOpenSlot() == -1)
 			{
 				GrandExchange.cancelAll();
-				MethodProvider.sleepUntil(() -> GrandExchange.isReadyToCollect(),Sleep.calculate(2222, 2222));
+				Sleep.sleepUntil(() -> GrandExchange.isReadyToCollect(),s.calculate(2222, 2222));
 				continue;
 			}
 			if(isGEActuallyReadyToCollect())
@@ -1379,7 +1385,7 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 				totalQty = (int)(coins/buyPrice);
 				if(totalQty <= 0)
 				{
-					MethodProvider.log("Not enough coins to buy vials! attempting sell any unf pots");
+					Logger.log("Not enough coins to buy vials! attempting sell any unf pots");
 					sellAllUnf();
 					return;
 				}
@@ -1387,7 +1393,7 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 			if(GrandExchange.buyItem(vial, totalQty, buyPrice))
 			{
 				putOffer = true;
-				MethodProvider.sleepUntil(() -> isGEActuallyReadyToCollect(), Sleep.calculate(2222, 2222));
+				Sleep.sleepUntil(() -> isGEActuallyReadyToCollect(), s.calculate(2222, 2222));
 				
 			}
 			continue;
@@ -1396,7 +1402,7 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 	public static void collect()
 	{
 		WidgetChild collect = Widgets.getWidgetChild(465,6,0);
-		if(collect != null && collect.interact()) MethodProvider.sleepUntil(() -> !isGEActuallyReadyToCollect(), Sleep.calculate(2222, 2222));
+		if(collect != null && collect.interact()) Sleep.sleepUntil(() -> !isGEActuallyReadyToCollect(), s.calculate(2222, 2222));
 	}
 	
 	public static Timer lastOfferTimer;
@@ -1411,7 +1417,7 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 		
 		if(Bank.contains(coins) || !Inventory.onlyContains(coins))
 		{
-			MethodProvider.log("[buyABunchOfHerbs] Init - Withdrawing coins / depositing everything else");
+			Logger.log("[buyABunchOfHerbs] Init - Withdrawing coins / depositing everything else");
 			if(!Bank.isOpen())
 			{
 				clickBank();
@@ -1419,16 +1425,16 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 			}
 			if(Bank.depositAllExcept(995) && Bank.withdrawAll(coins))
 			{
-				MethodProvider.sleepUntil(() -> !Bank.contains(coins),Sleep.calculate(2222, 2222));
+				Sleep.sleepUntil(() -> !Bank.contains(coins),s.calculate(2222, 2222));
 			}
 			return;
 		}
 		if(Bank.isOpen())
 		{
-			if(Bank.close()) MethodProvider.sleepUntil(() -> !Bank.isOpen(), Sleep.calculate(2222,2222));
+			if(Bank.close()) Sleep.sleepUntil(() -> !Bank.isOpen(), s.calculate(2222,2222));
 			return;
 		}
-		MethodProvider.log("[buyABunchOfHerbs] Starting check price of selected herb: " + selectedHerbPrice.herb.toString()+" after seeing out of all grimy/clean/unf! Updating profit/hr...");
+		Logger.log("[buyABunchOfHerbs] Starting check price of selected herb: " + selectedHerbPrice.herb.toString()+" after seeing out of all grimy/clean/unf! Updating profit/hr...");
 		if(isGEEmpty())
 		{
 			if(initCoins == -1)
@@ -1447,7 +1453,7 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 		boolean putOffer = false;
 		while(!timer.finished() && !ScriptManager.getScriptManager().isPaused() && ScriptManager.getScriptManager().isRunning())
 		{
-			Sleep.sleep(420, 696);
+			s.sleep(420, 696);
 			if(!GrandExchange.isOpen())
 			{
 				GrandExchange.open();
@@ -1469,7 +1475,7 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 				if(isGEEmpty()) break;
 				if(!completedGEOfferWithQty(selectedHerbPrice.herb.grimy,offerCount,true))
 				{
-					Sleep.sleep(1111, 1111);
+					s.sleep(1111, 1111);
 					continue;
 				}
 				break;
@@ -1477,7 +1483,7 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 			if(GrandExchange.getFirstOpenSlot() == -1)
 			{
 				GrandExchange.cancelAll();
-				MethodProvider.sleepUntil(() -> GrandExchange.isReadyToCollect(),Sleep.calculate(2222, 2222));
+				Sleep.sleepUntil(() -> GrandExchange.isReadyToCollect(),s.calculate(2222, 2222));
 				continue;
 			}
 			if(isGEActuallyReadyToCollect())
@@ -1491,13 +1497,13 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 			int totalPrice = buyPrice * offerCount;
 			if(Inventory.count(coins) < totalPrice)
 			{
-				MethodProvider.log("Not enough coins to buy a bunch of herbs!");
+				Logger.log("Not enough coins to buy a bunch of herbs!");
 				return;
 			}
 			if(GrandExchange.buyItem(selectedHerbPrice.herb.grimy, offerCount, buyPrice))
 			{
 				putOffer = true;
-				MethodProvider.sleepUntil(() -> isGEActuallyReadyToCollect(), Sleep.calculate(2222, 2222));
+				Sleep.sleepUntil(() -> isGEActuallyReadyToCollect(), s.calculate(2222, 2222));
 			}
 			continue;
 		}
@@ -1508,9 +1514,9 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 				g.getName().equals("Grand Exchange booth") && 
 				g.hasAction("Bank");
 		GameObject bank = GameObjects.closest(bankFilter);
-		if(bank != null && bank.interact("Bank")) MethodProvider.sleepUntil(() -> Bank.isOpen() || !l.exists(),
+		if(bank != null && bank.interact("Bank")) Sleep.sleepUntil(() -> Bank.isOpen() || !l.exists(),
 				() -> l.isMoving(),
-				Sleep.calculate(3333, 3333),69);
+				s.calculate(3333, 3333),69);
 	}
 	/**
 	 * checks bank for existing herbs, looks for all existing that have lvl for, randomize, set herb.
@@ -1520,7 +1526,7 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 	 */
 	public static boolean checkForAvailableExistingHerbs()
 	{
-		MethodProvider.log("Checking for available existing herbs");
+		Logger.log("Checking for available existing herbs");
 		if(!checkedBank()) return true;
 		final int herbLvl = Skills.getRealLevel(Skill.HERBLORE);
 		List<Herb> existingHerbs = new ArrayList<Herb>();
@@ -1543,7 +1549,7 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 				if(havePendingBuyOfferOfAnyGrimyOfLvl() || 
 						havePendingSellOfferOfAnyUnf())
 				{
-					MethodProvider.log("Have pending offers");
+					Logger.log("Have pending offers");
 					if(!GrandExchange.isOpen())
 					{
 						if(isGEHistoryOpen())
@@ -1553,7 +1559,7 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 							{
 								if(exchangeButton.interact("Exchange"))
 								{
-									MethodProvider.sleepUntil(GrandExchange::isOpen, Sleep.calculate(2222, 2222));
+									Sleep.sleepUntil(GrandExchange::isOpen, s.calculate(2222, 2222));
 								}
 							}
 							return true;
@@ -1610,7 +1616,7 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 		}
 		Collections.shuffle(existingHerbs);
 		selectedHerbPrice = new HerbPrice(existingHerbs.get(0),0,0,0,0);
-		MethodProvider.log("Selected random existing herb to process: " + selectedHerbPrice.herb.toString());
+		Logger.log("Selected random existing herb to process: " + selectedHerbPrice.herb.toString());
 		
 		return true;
 	}
@@ -1667,7 +1673,7 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 		List<HerbPrice> validHerbPrices = new ArrayList<HerbPrice>();
 		if(Bank.contains(coins) || !Inventory.onlyContains(coins))
 		{
-			MethodProvider.log("[priceCheckAvailableHerbs] Init - withdrawing all coins / depositing everything else");
+			Logger.log("[priceCheckAvailableHerbs] Init - withdrawing all coins / depositing everything else");
 			
 			if(!Bank.isOpen())
 			{
@@ -1676,23 +1682,23 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 			}
 			if(Bank.depositAllExcept(995) && Bank.withdrawAll(coins))
 			{
-				MethodProvider.sleepUntil(() -> !Bank.contains(coins),Sleep.calculate(2222, 2222));
+				Sleep.sleepUntil(() -> !Bank.contains(coins),s.calculate(2222, 2222));
 			}
 			return;
 		}
 		if(Bank.isOpen())
 		{
-			if(Bank.close()) MethodProvider.sleepUntil(() -> !Bank.isOpen(), Sleep.calculate(2222,2222));
+			if(Bank.close()) Sleep.sleepUntil(() -> !Bank.isOpen(), s.calculate(2222,2222));
 			return;
 		}
-		MethodProvider.log("[priceCheckAvailableHerbs] Starting");
+		Logger.log("[priceCheckAvailableHerbs] Starting");
 		
 		final int herblvl = Skills.getRealLevel(Skill.HERBLORE);
 		//invy only contains coins now
 		for(Herb herb : acceptableHerbs)
 		{
 			if(herblvl < herb.lvl) continue;
-			MethodProvider.log("Price checking herb: " + herb.toString());
+			Logger.log("Price checking herb: " + herb.toString());
 			int grimyOfferPrice = (int) Calculations.nextGaussianRandom((LivePrices.getHigh(herb.grimy) * 5), 50);
 			if(grimyOfferPrice >= 20000) grimyOfferPrice = (int) Calculations.nextGaussianRandom(20000, 1000);
 			int unfOfferPrice = (int) Calculations.nextGaussianRandom((LivePrices.getHigh(herb.unf) * 5), 50);
@@ -1710,7 +1716,7 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 			{
 				//need to buy grimy, then sell grimy, then buy unf, sell unf,
 				//then check history and search from top down for item id and qty = 1 of sold
-				Sleep.sleep(69, 420);
+				s.sleep(69, 420);
 				if(boughtGrimy && soldGrimy && boughtUnf && soldUnf)
 				{
 					if(isGEHistoryOpen())
@@ -1721,7 +1727,7 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 						final int soldUnfFor = getGEHistoryMostRecentTradePrice(herb.unf, false);
 						if(boughtGrimyFor == -1 || soldGrimyFor == -1 || boughtUnfFor == -1 || soldUnfFor == -1) 
 						{
-							MethodProvider.log("Failed to observe existing bought/sold qtys for grimy/unf herb! Trying again...");
+							Logger.log("Failed to observe existing bought/sold qtys for grimy/unf herb! Trying again...");
 							boughtGrimy = soldGrimy = boughtUnf = soldUnf = false;
 							continue;
 						}
@@ -1729,7 +1735,7 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 						foundHerbPrice.printHerbPrices();
 						if(foundHerbPrice.profitMargin < minProfitMargin)
 						{
-							MethodProvider.log("Profit margin of less than "+minProfitMargin+"gp! Skipping this herb...");
+							Logger.log("Profit margin of less than "+minProfitMargin+"gp! Skipping this herb...");
 							notTimeout = true;
 							break;
 						}
@@ -1744,8 +1750,8 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 						{
 							if(GETeller.interact("History"))
 							{
-								MethodProvider.sleepUntil(() -> !l.exists() || isGEHistoryOpen(),
-										()->l.isMoving(),Sleep.calculate(2222,2222),69);
+								Sleep.sleepUntil(() -> !l.exists() || isGEHistoryOpen(),
+										()->l.isMoving(),s.calculate(2222,2222),69);
 							}
 						}
 						continue;
@@ -1760,7 +1766,7 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 					{
 						if(historyButton.interact("History"))
 						{
-							MethodProvider.sleepUntil(() -> !l.exists() || isGEHistoryOpen(), Sleep.calculate(2222, 2222));
+							Sleep.sleepUntil(() -> !l.exists() || isGEHistoryOpen(), s.calculate(2222, 2222));
 						}
 						continue;
 					}
@@ -1778,7 +1784,7 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 							{
 								if(exchangeButton.interact("Exchange"))
 								{
-									MethodProvider.sleepUntil(() -> !l.exists() || GrandExchange.isOpen(), Sleep.calculate(2222, 2222));
+									Sleep.sleepUntil(() -> !l.exists() || GrandExchange.isOpen(), s.calculate(2222, 2222));
 								}
 							}
 							continue;
@@ -1798,7 +1804,7 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 					if(GrandExchange.getFirstOpenSlot() == -1)
 					{
 						GrandExchange.cancelAll();
-						MethodProvider.sleepUntil(() -> !l.exists() || GrandExchange.isReadyToCollect(),Sleep.calculate(2222, 2222));
+						Sleep.sleepUntil(() -> !l.exists() || GrandExchange.isReadyToCollect(),s.calculate(2222, 2222));
 						continue;
 					}
 					if(isGEActuallyReadyToCollect())
@@ -1809,7 +1815,7 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 					if(GrandExchange.buyItem(herb.grimy, 1, grimyOfferPrice))
 					{
 						putOffer = true;
-						MethodProvider.sleepUntil(() -> !l.exists() || isGEActuallyReadyToCollect(), Sleep.calculate(2222, 2222));
+						Sleep.sleepUntil(() -> !l.exists() || isGEActuallyReadyToCollect(), s.calculate(2222, 2222));
 					}
 					continue;
 				}
@@ -1837,7 +1843,7 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 					if(GrandExchange.sellItem(new Item(herb.grimy,1).getName(), 1, 1))
 					{
 						putOffer = true;
-						MethodProvider.sleepUntil(() -> !l.exists() || isGEActuallyReadyToCollect(), Sleep.calculate(2222, 2222));
+						Sleep.sleepUntil(() -> !l.exists() || isGEActuallyReadyToCollect(), s.calculate(2222, 2222));
 					}
 					continue;
 				}
@@ -1865,7 +1871,7 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 					if(GrandExchange.buyItem(herb.unf, 1, unfOfferPrice))
 					{
 						putOffer = true;
-						MethodProvider.sleepUntil(() -> !l.exists() || isGEActuallyReadyToCollect(), Sleep.calculate(2222, 2222));
+						Sleep.sleepUntil(() -> !l.exists() || isGEActuallyReadyToCollect(), s.calculate(2222, 2222));
 					}
 					continue;
 				}
@@ -1893,21 +1899,21 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 					if(GrandExchange.sellItem(new Item(herb.unf,1).getName(), 1, 1))
 					{
 						putOffer = true;
-						MethodProvider.sleepUntil(() -> !l.exists() || isGEActuallyReadyToCollect(), Sleep.calculate(2222, 2222));
+						Sleep.sleepUntil(() -> !l.exists() || isGEActuallyReadyToCollect(), s.calculate(2222, 2222));
 					}
 					continue;
 				}
 			}
-			if(!notTimeout)	MethodProvider.log("Timeout after 3 minutes of herb pricecheck!");
+			if(!notTimeout)	Logger.log("Timeout after 3 minutes of herb pricecheck!");
 		}
 		if(validHerbPrices.isEmpty())
 		{
-			MethodProvider.log("Failed to obtain any acceptable herb prices after checking all available herbs for lvl!");
+			Logger.log("Failed to obtain any acceptable herb prices after checking all available herbs for lvl!");
 			return;
 		}
 		if(xpMode)
 		{
-			MethodProvider.log("Sorting herb list according to highest lvl");
+			Logger.log("Sorting herb list according to highest lvl");
 			Collections.sort(validHerbPrices, new Comparator<HerbPrice>() {
 		          @Override
 		          public int compare(HerbPrice o1, HerbPrice o2) {
@@ -1917,7 +1923,7 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 		}
 		else
 		{
-			MethodProvider.log("Sorting herb list according to highest profit margin");
+			Logger.log("Sorting herb list according to highest profit margin");
 			Collections.sort(validHerbPrices, new Comparator<HerbPrice>() {
 		          @Override
 		          public int compare(HerbPrice o1, HerbPrice o2) {
@@ -1930,7 +1936,7 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 			herbPrice.printHerbPrices();
 		}
 		selectedHerbPrice = validHerbPrices.get(0);
-		MethodProvider.log("~Choosing herb: "+selectedHerbPrice.herb.toString()+"~");
+		Logger.log("~Choosing herb: "+selectedHerbPrice.herb.toString()+"~");
 		needSelectedHerbPriceCheck = false;
 	}
 	public static boolean isGEHistoryOpen()
@@ -2001,7 +2007,7 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 			if(i.getID() <=  0 || (buy ? !i.isBuyOffer() : !i.isSellOffer()))  continue;
 			if(i.getID() == itemID && i.getTransferredAmount() >= minQty)
 			{
-				MethodProvider.log("Found offer fulfilled for "+(buy ? "buy" : "sell")+" item: " + new Item(itemID,1).getName() + " in minQty: " + minQty);
+				Logger.log("Found offer fulfilled for "+(buy ? "buy" : "sell")+" item: " + new Item(itemID,1).getName() + " in minQty: " + minQty);
 				return true;
 			}
 		}
@@ -2144,7 +2150,7 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
     			Widgets.getWidgetChild(153,16).isVisible())
     	{
 			if(ClientSettings.isEscInterfaceClosingEnabled()) Keyboard.closeInterfaceWithESC();
-			else if(Widgets.getWidgetChild(153,16).interact("Close")) Sleep.sleep(696, 666);
+			else if(Widgets.getWidgetChild(153,16).interact("Close")) s.sleep(696, 666);
     		return true;
     	}
 		return false;
@@ -2212,9 +2218,9 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 			{
 				if(i.useOn(cauldron))
 				{
-					MethodProvider.sleepUntil(() -> !l.exists() || !Inventory.contains(i), 
+					Sleep.sleepUntil(() -> !l.exists() || !Inventory.contains(i), 
 							() -> l.isMoving(),
-							Sleep.calculate(3333, 3333),69);
+							s.calculate(3333, 3333),69);
 				}
 			}
 			return false;
@@ -2299,8 +2305,8 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 		if(!InvEquip.checkedBank()) return false;
 		InvEquip.clearAll();
 		InvEquip.addInvyItem(Combatz.lowFood, 5, (int) Calculations.nextGaussianRandom(10, 3), false, (int) Calculations.nextGaussianRandom(20, 5));
-		int newtQty = (int) Calculations.nextGaussianRandom(350, 33);
-		if(Bank.count(eyeOfNewt) < newtQty) InvEquip.addInvyItem(eyeOfNewt, 250, newtQty, true, newtQty);
+		int newbHerbBoostQty = (int) Calculations.nextGaussianRandom(350, 33);
+		if(Bank.count(eyeOfNewt) < newbHerbBoostQty) InvEquip.addInvyItem(eyeOfNewt, 250, newbHerbBoostQty, true, newbHerbBoostQty);
 		InvEquip.addInvyItem(id.rawBear, 1, 1, false, 1);
 		InvEquip.addInvyItem(id.rawRat, 1, 1, false, 1);
 		InvEquip.addInvyItem(id.rawBeef, 1, 1, false, 1);
@@ -2333,7 +2339,7 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 		String dialoge = Dialogues.getNPCDialogue();
 		if(dialoge != null && !dialoge.isEmpty() && !dialoge.equalsIgnoreCase("null") && !dialoge.equals(dialog))
 		{
-			MethodProvider.log("NPC Dialogue: " + dialoge);
+			Logger.log("NPC Dialogue: " + dialoge);
 			dialog = dialoge;
 		}
 	}
@@ -2346,14 +2352,14 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 		}
 		if(Dialogues.canContinue())
 		{
-			final int timeout = Sleep.calculate(3333,3333);
+			final int timeout = s.calculate(3333,3333);
 			final Condition condition = () -> {
 			 	updateLastNPCDialog();
 			 	return Dialogues.areOptionsAvailable() || 
 						!Dialogues.inDialogue();
 			};
 			Keyboard.holdSpace(condition,timeout);
-			MethodProvider.sleepUntil(condition, timeout);
+			Sleep.sleepUntil(condition, timeout);
 			return true;
 		}
 		if(Dialogues.areOptionsAvailable())
@@ -2432,6 +2438,6 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 	{
 		final int currentTick = ticks;
 		final int tickEnd = ticksToSleep + currentTick;
-		MethodProvider.sleepUntil(() -> !l.exists() || !Client.isLoggedIn() || ticks > tickEnd, Sleep.calculate(13000, 4444));
+		Sleep.sleepUntil(() -> !l.exists() || !Client.isLoggedIn() || ticks > tickEnd, s.calculate(13000, 4444));
 	}
 }

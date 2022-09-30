@@ -15,6 +15,8 @@ import org.dreambot.api.methods.map.Tile;
 import org.dreambot.api.methods.walking.impl.Walking;
 import org.dreambot.api.methods.world.World;
 import org.dreambot.api.methods.world.Worlds;
+import org.dreambot.api.utilities.Logger;
+import org.dreambot.api.utilities.Sleep;
 import org.dreambot.api.utilities.impl.Condition;
 import org.dreambot.api.wrappers.interactive.GameObject;
 import org.dreambot.api.wrappers.interactive.NPC;
@@ -86,18 +88,18 @@ public class API {
 		{
 			if(!Walkz.isStaminated()) Walkz.drinkStamina();
 			if(Walkz.isStaminated() && Walking.getRunEnergy() > 5 && !Walking.isRunEnabled()) Walking.toggleRun();
-			if(Walking.shouldWalk(6) && Walking.walk(area.getCenter())) Sleep.sleep(696, 666);
+			if(Walking.shouldWalk(6) && Walking.walk(area.getCenter())) s.sleep(696, 666);
 			return;
 		}
 		NPC npc = NPCs.closest(filter);
 		if(npc == null)
 		{
-			MethodProvider.log("NPC null!");
+			Logger.log("NPC null!");
 			return;
 		}
 		if(reachable && !npc.canReach())
 		{
-			if(Walking.walk(npc)) Sleep.sleep(420, 696);
+			if(Walking.walk(npc)) s.sleep(420, 696);
 			return;
 		}
 		if(npc.distance() > 10) Walking.walk(npc);
@@ -111,8 +113,8 @@ public class API {
 		{
 			if(condition == null) condition = Dialogues::inDialogue;
 			final Condition finalCondition = condition;
-			MethodProvider.sleepUntil(() -> finalCondition.verify(),
-					() -> ProfitableHerblore.l.isMoving(),Sleep.calculate(6666, 4444),69);
+			Sleep.sleepUntil(() -> finalCondition.verify(),
+					() -> ProfitableHerblore.l.isMoving(),s.calculate(6666, 4444),69);
 		}
 	}
 	private static void interactGameObject(Filter<GameObject> filter,String action,boolean walkToArea,boolean reachable,Area area, Condition condition)
@@ -121,13 +123,13 @@ public class API {
 		{
 			if(!Walkz.isStaminated()) Walkz.drinkStamina();
 			if(Walkz.isStaminated() && Walking.getRunEnergy() > 5 && !Walking.isRunEnabled()) Walking.toggleRun();
-			if(Walking.shouldWalk(6) && Walking.walk(area.getCenter())) Sleep.sleep(696, 666);
+			if(Walking.shouldWalk(6) && Walking.walk(area.getCenter())) s.sleep(696, 666);
 			return;
 		}
 		GameObject go = GameObjects.closest(filter);
 		if(go == null)
 		{
-			MethodProvider.log("GameObject null!");
+			Logger.log("GameObject null!");
 			return;
 		}
 		if(reachable)
@@ -143,7 +145,7 @@ public class API {
 			}
 			if(reachableSurrounding == false)
 			{
-				if(Walking.shouldWalk(6) && Walking.walk(go)) Sleep.sleep(696, 666);
+				if(Walking.shouldWalk(6) && Walking.walk(go)) s.sleep(696, 666);
 				return;
 			}
 			//must be able to reach it now, continue
@@ -159,8 +161,8 @@ public class API {
 		{
 			if(condition == null) condition = () -> go.getSurrounding().contains(ProfitableHerblore.l.getTile());
 			final Condition finalCondition = condition;
-			MethodProvider.sleepUntil(() -> finalCondition.verify(),
-					() -> ProfitableHerblore.l.isMoving(),Sleep.calculate(6666, 4444),69);
+			Sleep.sleepUntil(() -> finalCondition.verify(),
+					() -> ProfitableHerblore.l.isMoving(),s.calculate(6666, 4444),69);
 		}
 	}
 	public static void walkTalkWithGameObject(String objectName, String action) {
@@ -229,13 +231,13 @@ public class API {
 		{
 			if(!Walkz.isStaminated()) Walkz.drinkStamina();
 			if(Walkz.isStaminated() && Walking.getRunEnergy() > 5 && !Walking.isRunEnabled()) Walking.toggleRun();
-			if(Walking.shouldWalk(6) && Walking.walk(area.getCenter())) Sleep.sleep(696, 666);
+			if(Walking.shouldWalk(6) && Walking.walk(area.getCenter())) s.sleep(696, 666);
 			return;
 		}
 		GroundItem go = GroundItems.closest(filter);
 		if(go == null)
 		{
-			MethodProvider.log("GroundItem null!");
+			Logger.log("GroundItem null!");
 			return;
 		}
 		if(reachable)
@@ -251,7 +253,7 @@ public class API {
 			}
 			if(reachableSurrounding == false)
 			{
-				if(Walking.shouldWalk(6) && Walking.walk(go)) Sleep.sleep(696, 666);
+				if(Walking.shouldWalk(6) && Walking.walk(go)) s.sleep(696, 666);
 				return;
 			}
 			//must be able to reach it now, continue
@@ -268,8 +270,8 @@ public class API {
 			final int count = Inventory.count(go.getID());
 			if(condition == null) condition = () -> Inventory.count(go.getID()) > count;
 			final Condition finalCondition = condition;
-			MethodProvider.sleepUntil(() -> finalCondition.verify(),
-					() -> ProfitableHerblore.l.isMoving(),Sleep.calculate(6666, 4444),69);
+			Sleep.sleepUntil(() -> finalCondition.verify(),
+					() -> ProfitableHerblore.l.isMoving(),s.calculate(6666, 4444),69);
 		}
 	}
 	public static void walkPickupGroundItem(int groundItemID, String action, boolean reachable,Area groundItemArea)

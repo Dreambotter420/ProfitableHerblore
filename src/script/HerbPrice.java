@@ -1,7 +1,7 @@
 package script;
 
 
-import org.dreambot.api.methods.MethodProvider;
+import org.dreambot.api.utilities.Logger;
 
 import script.ProfitableHerblore.Herb;
 
@@ -24,6 +24,6 @@ public class HerbPrice {
 	}
 	public void printHerbPrices()
 	{
-		MethodProvider.log("Herb ["+this.herb.toString()+"] grimyLow ["+grimyLow+"] grimyHigh ["+grimyHigh+"] UnfLow ["+unfLow+"] UnfHigh ["+unfHigh+"] profitMargin ["+profitMargin+"]");
+		Logger.log("Herb ["+this.herb.toString()+"] grimyLow ["+grimyLow+"] grimyHigh ["+grimyHigh+"] UnfLow ["+unfLow+"] UnfHigh ["+unfHigh+"] profitMargin ["+profitMargin+"]");
 	}
 }

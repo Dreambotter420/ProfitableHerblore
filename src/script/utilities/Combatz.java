@@ -1,16 +1,13 @@
 package script.utilities;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.dreambot.api.Client;
 import org.dreambot.api.data.GameState;
 import org.dreambot.api.methods.Calculations;
-import org.dreambot.api.methods.MethodProvider;
 import org.dreambot.api.methods.combat.Combat;
 import org.dreambot.api.methods.container.impl.Inventory;
-import org.dreambot.api.methods.container.impl.bank.Bank;
 import org.dreambot.api.methods.settings.PlayerSettings;
 import org.dreambot.api.methods.skills.Skill;
 import org.dreambot.api.methods.skills.Skills;
@@ -18,9 +15,10 @@ import org.dreambot.api.methods.tabs.Tab;
 import org.dreambot.api.methods.tabs.Tabs;
 import org.dreambot.api.methods.widget.Widgets;
 import org.dreambot.api.script.ScriptManager;
+import org.dreambot.api.utilities.Logger;
+import org.dreambot.api.utilities.Sleep;
 import org.dreambot.api.utilities.Timer;
 import org.dreambot.api.wrappers.items.Item;
-import org.dreambot.api.wrappers.widgets.WidgetChild;
 
 
 public class Combatz {
@@ -63,10 +61,10 @@ public class Combatz {
 		if(Combat.isAutoRetaliateOn() == on) return true;
 		if(!Tabs.isOpen(Tab.COMBAT))
 		{
-			if(Tabs.open(Tab.COMBAT)) MethodProvider.sleepUntil(() -> Tabs.isOpen(Tab.COMBAT),Sleep.calculate(420, 696));
+			if(Tabs.open(Tab.COMBAT)) Sleep.sleepUntil(() -> Tabs.isOpen(Tab.COMBAT),s.calculate(420, 696));
 			return false;
 		}
-		if(Combat.toggleAutoRetaliate(on)) MethodProvider.sleepUntil(() -> Combat.isAutoRetaliateOn() == on, Sleep.calculate(2222, 2222));
+		if(Combat.toggleAutoRetaliate(on)) Sleep.sleepUntil(() -> Combat.isAutoRetaliateOn() == on, s.calculate(2222, 2222));
 		return Combat.isAutoRetaliateOn() == on;
 	}
 	
@@ -80,7 +78,7 @@ public class Combatz {
     		else if(tmp < maxHit) nextFoodHP = maxHit;
     		else nextFoodHP = tmp;
     	}
-    	if(Skills.getBoostedLevels(Skill.HITPOINTS) <= nextFoodHP)
+    	if(Skills.getBoostedLevel(Skill.HITPOINTS) <= nextFoodHP)
     	{
     		return true;
     	}
@@ -90,19 +88,19 @@ public class Combatz {
 	{
 		if(foodAttemptTimer != null && !foodAttemptTimer.isPaused() && !foodAttemptTimer.finished())
 		{
-			MethodProvider.log("attempted to eat food: " +foodAttemptTimer.elapsed()+"ms ago, continuing");
+			Logger.log("attempted to eat food: " +foodAttemptTimer.elapsed()+"ms ago, continuing");
 			return false;
 		}
 		Timer timer = new Timer(5000);
 		while(!timer.finished() && Client.getGameState() == GameState.LOGGED_IN
 				&& ScriptManager.getScriptManager().isRunning() && !ScriptManager.getScriptManager().isPaused())
 		{
-			Sleep.sleep(69, 69);
+			s.sleep(69, 69);
 			if(Tabs.isOpen(Tab.INVENTORY))
 			{
 				if(foodEatTimer != null && !foodEatTimer.finished())
 				{
-					MethodProvider.log("Called eatFood function, but food after-eat-timer still running! Waiting...");
+					Logger.log("Called eatFood function, but food after-eat-timer still running! Waiting...");
 					continue;
 				}
 				Item food = getFood();
@@ -126,7 +124,7 @@ public class Combatz {
 				
 				if(Inventory.interact(foodID, action))
 				{
-					MethodProvider.log("Attempted to eat food!");
+					Logger.log("Attempted to eat food!");
 					nextFoodHP = 0;
 					foodAttemptTimer = new Timer(600);
 					foodEatTimer = new Timer(1200); // when u eat a food, it waits until next tick to actually eat it.
@@ -141,7 +139,7 @@ public class Combatz {
 				if(Widgets.isOpen())
 				{
 					Widgets.closeAll();
-					Sleep.sleep(111, 111);
+					s.sleep(111, 111);
 				}
 				else Tabs.open(Tab.INVENTORY);
 			}
