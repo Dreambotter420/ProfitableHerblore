@@ -10,7 +10,6 @@ import java.util.Map.Entry;
 import org.dreambot.api.Client;
 import org.dreambot.api.data.GameState;
 import org.dreambot.api.methods.Calculations;
-import org.dreambot.api.methods.MethodProvider;
 import org.dreambot.api.methods.container.impl.Inventory;
 import org.dreambot.api.methods.container.impl.Shop;
 import org.dreambot.api.methods.container.impl.bank.Bank;
@@ -754,7 +753,7 @@ public class InvEquip {
 						if(Inventory.emptySlotCount() <= 0)
 						{
 							depositExtraJunk();
-							MethodProvider.sleep(s.calculate(420,696));
+							s.sleep(420,696);
 							continue;
 						}
 						justCollected = false;
@@ -1841,7 +1840,7 @@ public class InvEquip {
 										if(Inventory.emptySlotCount() < 1)
 										{
 											depositExtraJunk();
-											MethodProvider.sleep(s.calculate(420,696));
+											s.sleep(420,696);
 											continue;
 										}
 										if(Bank.withdrawAll(unnotedID))
@@ -1862,7 +1861,7 @@ public class InvEquip {
 									if(Inventory.emptySlotCount() < 1)
 									{
 										depositExtraJunk();
-										MethodProvider.sleep(s.calculate(420,696));
+										s.sleep(420,696);
 										continue;
 									}
 									Logger.log("attempting withdraw of item: " + new Item(unnotedID,1).getName() + " in amount: " + neededForMax);
@@ -1881,7 +1880,7 @@ public class InvEquip {
 								if(Inventory.emptySlotCount() < 1)
 								{
 									depositExtraJunk();
-									MethodProvider.sleep(s.calculate(420,696));
+									s.sleep(420,696);
 									continue;
 								}
 								if(Bank.withdrawAll(unnotedID))

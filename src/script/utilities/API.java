@@ -3,7 +3,6 @@ package script.utilities;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import org.dreambot.api.methods.MethodProvider;
 import org.dreambot.api.methods.container.impl.Inventory;
 import org.dreambot.api.methods.dialogues.Dialogues;
 import org.dreambot.api.methods.filter.Filter;

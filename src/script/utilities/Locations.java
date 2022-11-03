@@ -1,22 +1,7 @@
 package script.utilities;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.dreambot.api.methods.MethodProvider;
-import org.dreambot.api.methods.dialogues.Dialogues;
-import org.dreambot.api.methods.filter.Filter;
-import org.dreambot.api.methods.interactive.GameObjects;
-import org.dreambot.api.methods.interactive.NPCs;
-import org.dreambot.api.methods.interactive.Players;
 import org.dreambot.api.methods.map.Area;
 import org.dreambot.api.methods.map.Tile;
-import org.dreambot.api.methods.walking.impl.Walking;
-import org.dreambot.api.methods.walking.pathfinding.impl.web.WebFinder;
-import org.dreambot.api.methods.walking.web.node.AbstractWebNode;
-import org.dreambot.api.methods.walking.web.node.impl.BasicWebNode;
-import org.dreambot.api.wrappers.interactive.GameObject;
-import org.dreambot.api.wrappers.interactive.NPC;
 
 
 public class Locations {
