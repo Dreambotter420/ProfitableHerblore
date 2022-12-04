@@ -818,7 +818,7 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 			for(Item i : Inventory.all(filter))
 			{
 				if(i == null) continue;
-				if(Mouse.click(i.getDestination(), ClickMode.LEFT_CLICK))
+				if(i.interact("Clean"))
 				{
 					cleans++;
 					s.sleep(42,69);
@@ -1397,7 +1397,7 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 			sellAllUnf();
 			return;
 		}
-		if(Bank.contains(coins) || !Inventory.onlyContains(coins))
+		if(Bank.contains(coins) || (Inventory.contains(coins) && !Inventory.onlyContains(coins)))
 		{
 			Logger.log("[buyMoreVials] Init - Withdrawing coins / depositing everything else");
 			if(!Bank.isOpen())
@@ -1405,7 +1405,8 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 				clickBank();
 				return;
 			}
-			if(!Inventory.onlyContains(coins))
+			
+			if((Inventory.contains(coins) && !Inventory.onlyContains(coins)))
 			{
 				if(Bank.depositAllExcept(coins)) 
 				{
@@ -1496,7 +1497,7 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 	{
 		currentTask = "Buying a bunch of "+new Item(selectedHerbPrice.herb.grimy,1).getName();
 		
-		if(Bank.contains(coins) || !Inventory.onlyContains(coins))
+		if(Bank.contains(coins) || (Inventory.contains(coins) && !Inventory.onlyContains(coins)))
 		{
 			Logger.log("[buyABunchOfHerbs] Init - Withdrawing coins / depositing everything else");
 			if(!Bank.isOpen())
@@ -1504,7 +1505,7 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 				clickBank();
 				return;
 			}
-			if(!Inventory.onlyContains(coins))
+			if((Inventory.contains(coins) && !Inventory.onlyContains(coins)))
 			{
 				if(Bank.depositAllExcept(coins)) 
 				{
@@ -1789,7 +1790,7 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 		//check bank, get coins, deposit everything else
 		if(!InvEquip.checkedBank()) return;
 		List<HerbPrice> validHerbPrices = new ArrayList<HerbPrice>();
-		if(Bank.contains(coins) || !Inventory.onlyContains(coins))
+		if(Bank.contains(coins) || (Inventory.contains(coins) && !Inventory.onlyContains(coins)))
 		{
 			Logger.log("[priceCheckAvailableHerbs] Init - withdrawing all coins / depositing everything else");
 			
@@ -1798,7 +1799,7 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 				clickBank();
 				return;
 			}
-			if(!Inventory.onlyContains(coins))
+			if((Inventory.contains(coins) && !Inventory.onlyContains(coins)))
 			{
 				if(Bank.depositAllExcept(coins)) 
 				{
