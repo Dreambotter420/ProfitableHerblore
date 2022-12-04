@@ -16,6 +16,8 @@ import java.util.List;
 import org.dreambot.api.Client;
 import org.dreambot.api.ClientSettings;
 import org.dreambot.api.data.GameState;
+import org.dreambot.api.input.Mouse;
+import org.dreambot.api.input.event.impl.mouse.impl.click.ClickMode;
 import org.dreambot.api.methods.Calculations;
 import org.dreambot.api.methods.container.impl.Inventory;
 import org.dreambot.api.methods.container.impl.bank.Bank;
@@ -36,6 +38,8 @@ import org.dreambot.api.methods.interactive.Players;
 import org.dreambot.api.methods.settings.PlayerSettings;
 import org.dreambot.api.methods.skills.Skill;
 import org.dreambot.api.methods.skills.Skills;
+import org.dreambot.api.methods.tabs.Tab;
+import org.dreambot.api.methods.tabs.Tabs;
 import org.dreambot.api.methods.widget.Widgets;
 import org.dreambot.api.methods.widget.helpers.ItemProcessing;
 import org.dreambot.api.script.AbstractScript;
@@ -67,7 +71,7 @@ import script.utilities.id;
 
 
 
-@ScriptManifest(name = "Profitable Herblore", author = "Dreambotter420", version = 0.04, category = Category.MISC)
+@ScriptManifest(name = "Profitable Herblore", author = "Dreambotter420", version = 0.05, category = Category.MISC)
 public class ProfitableHerblore extends AbstractScript implements ChatListener, PaintInfo, GameTickListener
 {
 	public static boolean closedGUI = false;
@@ -255,17 +259,28 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 			botMode = botModeBox.isSelected();
 			xpMode = XPModeBox.isSelected();
 			
+			//set boolean of whether or not to start after clicking start
+			boolean start = true;
+			
 			//minimum profit margin
 			String str = minProfitMarginTextField.getText().replace(" ", "");
-		
 			if(!str.isEmpty())
 			{
 				if(!str.matches("[0-9]+")) 
 				{
-					minProfitMarginTextField.setText("nUmBeR");
-					return;
+					minProfitMarginTextField.setText("number");
+					start = false;
 				}
-				else minProfitMargin = Integer.parseInt(str);
+				else
+				{
+					int tmp = Integer.parseInt(str);
+					if(tmp <= 0)
+					{
+						minProfitMarginTextField.setText(">=1 pls");
+						start = false;
+					}
+					else minProfitMargin = tmp;
+				}
 			}
 			
 			//undercutting buy grimy
@@ -274,10 +289,18 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 			{
 				if(!str.matches("[0-9]+")) 
 				{
-					undercuttingMaxGrimyBuyTextField.setText("nUmBeR");
-					return;
+					undercuttingMaxGrimyBuyTextField.setText("number");
+					start = false;
 				}
-				else undercuttingBuyGrimy = Integer.parseInt(str);
+				else 
+				{
+					int tmp = Integer.parseInt(str);
+					if(tmp <= 0)
+					{
+						undercuttingMaxGrimyBuyTextField.setText(">=1 pls");
+						start = false;
+					} else undercuttingBuyGrimy = tmp;
+				}
 			}
 			
 			//undercutting sell unf
@@ -286,10 +309,19 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 			{
 				if(!str.matches("[0-9]+")) 
 				{
-					undercuttingMinSellUnfTextField.setText("nUmBeR");
-					return;
+					undercuttingMinSellUnfTextField.setText("number");
+					start = false;
 				}
-				else undercuttingSellUnf = Integer.parseInt(str);
+				else
+				{
+					int tmp = Integer.parseInt(str);
+					if(tmp <= 0)
+					{
+						undercuttingMinSellUnfTextField.setText(">=1 pls");
+						start = false;
+					}
+					else undercuttingSellUnf = tmp;
+				}
 			}
 			
 			//maximum grimy herb qty to buy
@@ -298,12 +330,22 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 			{
 				if(!str.matches("[0-9]+")) 
 				{
-					maxGrimyTextField.setText("nUmBeR");
-					return;
+					maxGrimyTextField.setText("number");
+					start = false;
 				}
-				else maxHerbBuyQty = Integer.parseInt(str);
+				else
+				{
+					int tmp = Integer.parseInt(str);
+					if(tmp <= 0)
+					{
+						maxGrimyTextField.setText(">=1 pls");
+						start = false;
+					}
+					else maxHerbBuyQty = tmp;					
+				}
+				
 			}
-			
+			if(!start) return;
 			closedGUI = true;
 			Logger.log("Starting after closing GUI!");
 			frame.dispose();
@@ -360,7 +402,13 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 					Logger.log("Ignoring found -param due to not number: " + para);
 					continue;
 				}
-				maxHerbBuyQty = Integer.parseInt(number);
+				int tmp = Integer.parseInt(number);
+				if(tmp <= 0) 
+				{
+					Logger.log("Ignoring found -param due to number less than or equal to zero: " + para);
+					continue;
+				}
+				maxHerbBuyQty = tmp;
 				Logger.log("Setting maximum herb buy quantity: "+maxHerbBuyQty);
 			}
 			if(para.contains("profitmargin="))
@@ -371,7 +419,13 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 					Logger.log("Ignoring found -param due to not number: " + para);
 					continue;
 				}
-				minProfitMargin = Integer.parseInt(number);
+				int tmp = Integer.parseInt(number);
+				if(tmp <= 0) 
+				{
+					Logger.log("Ignoring found -param due to number less than or equal to zero: " + para);
+					continue;
+				}
+				minProfitMargin = tmp;
 				Logger.log("Minimum profit margin per grimy -> unf herb: "+minProfitMargin+"gp");
 			}
 			if(para.contains("undercutsell="))
@@ -382,7 +436,13 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 					Logger.log("Ignoring found -param due to not number: " + para);
 					continue;
 				}
-				undercuttingSellUnf = Integer.parseInt(number);
+				int tmp = Integer.parseInt(number);
+				if(tmp <= 0) 
+				{
+					Logger.log("Ignoring found -param due to number less than or equal to zero: " + para);
+					continue;
+				}
+				undercuttingSellUnf = tmp;
 				Logger.log("Undercutting sell unf by: "+undercuttingSellUnf+"gp");
 			}
 			if(para.contains("undercutbuy="))
@@ -393,7 +453,13 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 					Logger.log("Ignoring found -param due to not number: " + para);
 					continue;
 				}
-				undercuttingBuyGrimy = Integer.parseInt(number);
+				int tmp = Integer.parseInt(number);
+				if(tmp <= 0) 
+				{
+					Logger.log("Ignoring found -param due to number less than or equal to zero: " + para);
+					continue;
+				}
+				undercuttingBuyGrimy = tmp;
 				Logger.log("Undercutting sell unf by: "+undercuttingBuyGrimy+"gp");
 			}
 			if(para.contains("xpmode="))
@@ -673,7 +739,11 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 			if(clean == guam && Inventory.count(unf) > 0 && Bank.count(eyeOfNewt) > 0)
 			{
 				currentTask = "Withdrawing 14 eyes of newt";
-				if(Bank.withdraw(eyeOfNewt,14)) s.sleep(69, 111);
+				if(Bank.withdraw(eyeOfNewt,14)) 
+				{
+					Sleep.sleepUntil(() -> Inventory.contains(eyeOfNewt), s.calculate(3333, 3333));
+				}
+				s.sleep(69, 111);
 				Bank.close();
 				Sleep.sleepUntil(() -> Inventory.contains(eyeOfNewt), s.calculate(3333, 3333));
 				return s.calculate(69, 696);
@@ -682,6 +752,7 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 			Logger.log("Depositing all items");
 			if(Bank.depositAllItems()) 
 			{
+				Sleep.sleepUntil(() -> Inventory.isEmpty(), s.calculate(3333, 3333));
 				s.sleep(69, 111);
 			}
 			if(bankGrimys > 0) 
@@ -738,16 +809,20 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 		if(Inventory.contains(grimy))
 		{
 			currentTask = "Cleaning grimys";
+			if(!Tabs.isOpen(Tab.INVENTORY))
+			{
+				Tabs.open(Tab.INVENTORY);
+				return s.calculate(111, 696);
+			}
 			Filter<Item> filter = i -> i!=null && i.getID() == grimy;
 			for(Item i : Inventory.all(filter))
 			{
 				if(i == null) continue;
-				if(Inventory.slotInteract(i.getSlot(), "Clean")) 
+				if(Mouse.click(i.getDestination(), ClickMode.LEFT_CLICK))
 				{
 					cleans++;
-					Sleep.sleep((int) Calculations.nextGaussianRandom(50, 33));
+					s.sleep(42,69);
 				}
-				else if(i.interact("Clean")) s.sleep(42,69);
 			}
 			if(Inventory.contains(vial))
 			{
@@ -806,7 +881,7 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 		Logger.log("[sellAllUnf] Start");
 		
 		needSelectedHerbPriceCheck = true;
-		if(!checkedBank()) return;
+		if(!InvEquip.checkedBank()) return;
 		Timer timer = new Timer((int) Calculations.nextGaussianRandom(80000,20000));
 		int randUnfID = -1;
 		int randUnfOfferCount = -1;
@@ -832,6 +907,18 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 						tempHerbPrice = null;
 						putOffer = false;
 					}
+					//if inventory contains any grimy herbs, break
+					int herbLvl = Skills.getRealLevel(Skill.HERBLORE);
+					List<Integer> acceptableIDs = new ArrayList<>();
+					acceptableHerbs.stream().filter(h -> h.lvl <= herbLvl).forEach(h -> 
+					{
+						acceptableIDs.add(h.grimy);
+					});
+					if(Inventory.contains(i -> i != null && acceptableIDs.contains(i.getID()))) 
+					{
+						Logger.log("Found grimy herbs to clean in invy! Stopping waiting for unf to sell");
+						return;
+					}
 					if(!completedGEOfferWithQty(randUnfID,randUnfOfferCount,false))
 					{
 						s.sleep(111, 1111);
@@ -856,7 +943,10 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 				{
 					if(Bank.contains(coins)) 
 					{
-						Bank.withdrawAll(coins);
+						if(Bank.withdrawAll(coins))
+						{
+							Sleep.sleepUntil(() -> !Bank.contains(coins), s.calculate(3333, 3333));
+						}
 						continue;
 					}
 					if(Bank.close()) Sleep.sleepUntil(() -> !Bank.isOpen(), s.calculate(2222, 2222));
@@ -895,7 +985,7 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 				
 				if(!GrandExchange.isOpen())
 				{
-					GrandExchange.open();
+					openGE();
 					continue;
 				}
 				if(GrandExchange.getFirstOpenSlot() == -1)
@@ -940,7 +1030,10 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 				}
 				if(Bank.getWithdrawMode() == BankMode.NOTE)
 				{
-					Bank.withdrawAll(unfCoinsFilter);
+					if(Bank.withdrawAll(unfCoinsFilter))
+					{
+						Sleep.sleepUntil(() -> !Bank.contains(unfCoinsFilter), s.calculate(3333, 3333));
+					}
 					continue;
 				}
 				Bank.setWithdrawMode(BankMode.NOTE);
@@ -1014,19 +1107,7 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 			{
 				if(!GrandExchange.isOpen())
 				{
-					if(isGEHistoryOpen())
-					{
-						WidgetChild exchangeButton = Widgets.getChildWidget(383, 2);
-						if(exchangeButton != null && exchangeButton.isVisible())
-						{
-							if(exchangeButton.interact("Exchange"))
-							{
-								Sleep.sleepUntil(GrandExchange::isOpen, s.calculate(2222, 2222));
-							}
-						}
-						continue;
-					}
-					GrandExchange.open();
+					openGE();
 					continue;
 				}
 				if(putOffer)
@@ -1062,7 +1143,7 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 		currentTask = "Checking prices of selected herb: "+selectedHerbPrice.herb.toString();
 		
 		//check bank, get coins, deposit everything else
-		if(!checkedBank()) return;
+		if(!InvEquip.checkedBank()) return;
 		Logger.log("[priceCheckSelectedHerb] Starting check price of selected herb: " + selectedHerbPrice.herb.toString());
 		
 		int grimyOfferPrice = (int) Calculations.nextGaussianRandom((LivePrices.getHigh(selectedHerbPrice.herb.grimy) * 5), 50);
@@ -1159,19 +1240,7 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 					}
 					if(!GrandExchange.isOpen())
 					{
-						if(isGEHistoryOpen())
-						{
-							WidgetChild exchangeButton = Widgets.getChildWidget(383, 2);
-							if(exchangeButton != null && exchangeButton.isVisible())
-							{
-								if(exchangeButton.interact("Exchange"))
-								{
-									Sleep.sleepUntil(GrandExchange::isOpen, s.calculate(2222, 2222));
-								}
-							}
-							continue;
-						}
-						GrandExchange.open();
+						openGE();
 						continue;
 					}
 					if(isGEActuallyReadyToCollect()) {
@@ -1184,19 +1253,7 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 				}
 				if(!GrandExchange.isOpen())
 				{
-					if(isGEHistoryOpen())
-					{
-						WidgetChild exchangeButton = Widgets.getChildWidget(383, 2);
-						if(exchangeButton != null && exchangeButton.isVisible())
-						{
-							if(exchangeButton.interact("Exchange"))
-							{
-								Sleep.sleepUntil(GrandExchange::isOpen, s.calculate(2222, 2222));
-							}
-						}
-						continue;
-					}
-					GrandExchange.open();
+					openGE();
 					continue;
 				}
 				if(putOffer)
@@ -1230,7 +1287,7 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 			{
 				if(!GrandExchange.isOpen())
 				{
-					GrandExchange.open();
+					openGE();
 					continue;
 				}
 				if(putOffer)
@@ -1258,7 +1315,7 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 			{
 				if(!GrandExchange.isOpen())
 				{
-					GrandExchange.open();
+					openGE();
 					continue;
 				}
 				if(putOffer)
@@ -1286,7 +1343,7 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 			{
 				if(!GrandExchange.isOpen())
 				{
-					GrandExchange.open();
+					openGE();
 					continue;
 				}
 				if(putOffer)
@@ -1314,6 +1371,22 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 		Logger.log("Timeout after 3 minutes of pricecheck selected herb! Resetting selected herb...");
 		selectedHerbPrice = null;
 	}
+	public static void openGE()
+	{
+		if(isGEHistoryOpen())
+		{
+			WidgetChild exchangeButton = Widgets.getChildWidget(383, 2);
+			if(exchangeButton != null && exchangeButton.isVisible())
+			{
+				if(exchangeButton.interact("Exchange"))
+				{
+					Sleep.sleepUntil(GrandExchange::isOpen, s.calculate(3333, 3333));
+				}
+			}
+			return;
+		}
+		GrandExchange.open();
+	}
 	public static void buyMoreVials()
 	{
 		currentTask = "Buying 13k vials";
@@ -1332,7 +1405,15 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 				clickBank();
 				return;
 			}
-			if(Bank.depositAllExcept(995) && Bank.withdrawAll(coins))
+			if(!Inventory.onlyContains(coins))
+			{
+				if(Bank.depositAllExcept(coins)) 
+				{
+					Sleep.sleepUntil(() -> Inventory.onlyContains(coins), s.calculate(3333, 3333));
+				}
+				return;
+			}
+			if(Bank.withdrawAll(coins))
 			{
 				Sleep.sleepUntil(() -> !Bank.contains(coins),s.calculate(2222, 2222));
 			}
@@ -1354,7 +1435,7 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 			s.sleep(420, 696);
 			if(!GrandExchange.isOpen())
 			{
-				GrandExchange.open();
+				openGE();
 				continue;
 			}
 			if(putOffer)
@@ -1402,7 +1483,7 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 	public static void collect()
 	{
 		WidgetChild collect = Widgets.getWidgetChild(465,6,0);
-		if(collect != null && collect.interact()) Sleep.sleepUntil(() -> !isGEActuallyReadyToCollect(), s.calculate(2222, 2222));
+		if(collect != null && collect.isVisible() && collect.interact()) Sleep.sleepUntil(() -> !isGEActuallyReadyToCollect(), s.calculate(2222, 2222));
 	}
 	
 	public static Timer lastOfferTimer;
@@ -1423,7 +1504,15 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 				clickBank();
 				return;
 			}
-			if(Bank.depositAllExcept(995) && Bank.withdrawAll(coins))
+			if(!Inventory.onlyContains(coins))
+			{
+				if(Bank.depositAllExcept(coins)) 
+				{
+					Sleep.sleepUntil(() -> Inventory.onlyContains(coins), s.calculate(3333, 3333));
+				}
+				return;
+			}
+			if(Bank.withdrawAll(coins))
 			{
 				Sleep.sleepUntil(() -> !Bank.contains(coins),s.calculate(2222, 2222));
 			}
@@ -1434,7 +1523,7 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 			if(Bank.close()) Sleep.sleepUntil(() -> !Bank.isOpen(), s.calculate(2222,2222));
 			return;
 		}
-		Logger.log("[buyABunchOfHerbs] Starting check price of selected herb: " + selectedHerbPrice.herb.toString()+" after seeing out of all grimy/clean/unf! Updating profit/hr...");
+		Logger.log("[buyABunchOfHerbs] Starting to buy selected herb: " + selectedHerbPrice.herb.toString()+" after seeing out of all grimy/clean/unf! Updating profit/hr...");
 		if(isGEEmpty())
 		{
 			if(initCoins == -1)
@@ -1449,14 +1538,13 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 			profitPerHour = (int) ((double) profit / ((double)profitTimer.elapsed() / 3600000));
 		}
 		Timer timer = new Timer((int) Calculations.nextGaussianRandom(80000, 20000));
-		int offerCount = -1;
 		boolean putOffer = false;
 		while(!timer.finished() && !ScriptManager.getScriptManager().isPaused() && ScriptManager.getScriptManager().isRunning())
 		{
 			s.sleep(420, 696);
 			if(!GrandExchange.isOpen())
 			{
-				GrandExchange.open();
+				openGE();
 				continue;
 			}
 			if(havePendingBuyOfferOfAnyGrimyOfLvl()) putOffer = true;
@@ -1468,17 +1556,28 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 				}
 				if(isGEActuallyReadyToCollect())
 				{
-					if(!GrandExchange.isOpen()) GrandExchange.open();
+					if(!GrandExchange.isOpen()) 
+					{
+						openGE();
+						continue;
+					}
 					collect();
 					continue;
 				}
 				if(isGEEmpty()) break;
-				if(!completedGEOfferWithQty(selectedHerbPrice.herb.grimy,offerCount,true))
+				//if inventory contains any grimy herbs
+				int herbLvl = Skills.getRealLevel(Skill.HERBLORE);
+				List<Integer> acceptableIDs = new ArrayList<>();
+				acceptableHerbs.stream().filter(h -> h.lvl <= herbLvl).forEach(h -> 
 				{
-					s.sleep(1111, 1111);
-					continue;
+					acceptableIDs.add(h.grimy);
+				});
+				Item grimy = Inventory.get(i -> i != null && acceptableIDs.contains(i.getID()));
+				if(grimy != null)
+				{
+					Logger.log("Found grimy herbs: "+ grimy.getName()+" to clean in invy! Stopping waiting for selected herb to buy");
+					return;
 				}
-				break;
 			}
 			if(GrandExchange.getFirstOpenSlot() == -1)
 			{
@@ -1492,22 +1591,53 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 				continue;
 			}
 			int buyPrice = selectedHerbPrice.grimyHigh + undercuttingBuyGrimy;
-			offerCount = (int) Math.floor(Inventory.count(coins) / buyPrice); //buy up as many as can afford
-			if(offerCount >= maxHerbBuyQty) offerCount = (int) Calculations.nextGaussianRandom((maxHerbBuyQty - 100), 25);
-			int totalPrice = buyPrice * offerCount;
+			int maxAffordableQty = (int) Math.floor(Inventory.count(coins) / buyPrice); //buy up as many as can afford
+			if(maxAffordableQty > maxHerbBuyQty)
+			{
+				int tmp = 0;
+				while(randBuyQty < 1 || randBuyQty > maxHerbBuyQty )
+				{
+					randBuyQty = (int) Calculations.nextGaussianRandom(maxHerbBuyQty, 5);
+					tmp++;
+					if(tmp > 1000)
+					{
+						Logger.log("Tried 1000 times to get a random gaussian mean: "+maxHerbBuyQty+" sigma:"+5+
+								", but all returned less than 1 or more than maxHerbBuyQty: "+maxHerbBuyQty+" :-(");
+						return;
+					}
+				}
+			}
+			else 
+			{
+				int tmp = 0;
+				while(randBuyQty < 1 || randBuyQty > maxAffordableQty)
+				{
+					randBuyQty = (int) Calculations.nextGaussianRandom(maxAffordableQty, 5);
+					tmp++;
+					if(tmp > 1000)
+					{
+						Logger.log("Tried 1000 times to get a random gaussian mean: "+maxHerbBuyQty+" sigma:"+5+", but all returned less than 1 :-(");
+						return;
+					}
+				}
+			}
+			//here we have a valid qty to buy set to variable
+			int totalPrice = buyPrice * randBuyQty;
 			if(Inventory.count(coins) < totalPrice)
 			{
 				Logger.log("Not enough coins to buy a bunch of herbs!");
 				return;
 			}
-			if(GrandExchange.buyItem(selectedHerbPrice.herb.grimy, offerCount, buyPrice))
+			if(GrandExchange.buyItem(selectedHerbPrice.herb.grimy, randBuyQty, buyPrice))
 			{
 				putOffer = true;
+				randBuyQty = -1;
 				Sleep.sleepUntil(() -> isGEActuallyReadyToCollect(), s.calculate(2222, 2222));
 			}
 			continue;
 		}
 	}
+	public static int randBuyQty = -1;
 	public static void clickBank()
 	{
 		Filter<GameObject> bankFilter = g-> g!=null && 
@@ -1520,14 +1650,14 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 	}
 	/**
 	 * checks bank for existing herbs, looks for all existing that have lvl for, randomize, set herb.
-	 * If only find unf pots then sell all unf pots.
+	 * Set herb == create new HerbPrice object and populate the selectedHerbPrice variable with it.
 	 * Returns true if not done checking, false if out of everything.
 	 * @return
 	 */
 	public static boolean checkForAvailableExistingHerbs()
 	{
 		Logger.log("Checking for available existing herbs");
-		if(!checkedBank()) return true;
+		if(!InvEquip.checkedBank()) return true;
 		final int herbLvl = Skills.getRealLevel(Skill.HERBLORE);
 		List<Herb> existingHerbs = new ArrayList<Herb>();
 		List<Integer> existingUnf = new ArrayList<Integer>();
@@ -1552,19 +1682,7 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 					Logger.log("Have pending offers");
 					if(!GrandExchange.isOpen())
 					{
-						if(isGEHistoryOpen())
-						{
-							WidgetChild exchangeButton = Widgets.getChildWidget(383, 2);
-							if(exchangeButton != null && exchangeButton.isVisible())
-							{
-								if(exchangeButton.interact("Exchange"))
-								{
-									Sleep.sleepUntil(GrandExchange::isOpen, s.calculate(2222, 2222));
-								}
-							}
-							return true;
-						}
-						GrandExchange.open();
+						openGE();
 						return true;
 					}
 					if(havePendingBuyOfferOfAnyGrimyOfLvl())
@@ -1669,7 +1787,7 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 		currentTask = "Price checking herbs";
 		
 		//check bank, get coins, deposit everything else
-		if(!checkedBank()) return;
+		if(!InvEquip.checkedBank()) return;
 		List<HerbPrice> validHerbPrices = new ArrayList<HerbPrice>();
 		if(Bank.contains(coins) || !Inventory.onlyContains(coins))
 		{
@@ -1680,7 +1798,15 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 				clickBank();
 				return;
 			}
-			if(Bank.depositAllExcept(995) && Bank.withdrawAll(coins))
+			if(!Inventory.onlyContains(coins))
+			{
+				if(Bank.depositAllExcept(coins)) 
+				{
+					Sleep.sleepUntil(() -> Inventory.onlyContains(coins), s.calculate(3333, 3333));
+				}
+				return;
+			}
+			if(Bank.withdrawAll(coins))
 			{
 				Sleep.sleepUntil(() -> !Bank.contains(coins),s.calculate(2222, 2222));
 			}
@@ -1777,19 +1903,7 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 				{
 					if(!GrandExchange.isOpen())
 					{
-						if(isGEHistoryOpen())
-						{
-							WidgetChild exchangeButton = Widgets.getChildWidget(383, 2);
-							if(exchangeButton != null && exchangeButton.isVisible())
-							{
-								if(exchangeButton.interact("Exchange"))
-								{
-									Sleep.sleepUntil(() -> !l.exists() || GrandExchange.isOpen(), s.calculate(2222, 2222));
-								}
-							}
-							continue;
-						}
-						GrandExchange.open();
+						openGE();
 						continue;
 					}
 					if(putOffer)
@@ -1823,7 +1937,7 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 				{
 					if(!GrandExchange.isOpen())
 					{
-						GrandExchange.open();
+						openGE();
 						continue;
 					}
 					if(putOffer)
@@ -1851,7 +1965,7 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 				{
 					if(!GrandExchange.isOpen())
 					{
-						GrandExchange.open();
+						openGE();
 						continue;
 					}
 					if(putOffer)
@@ -1879,7 +1993,7 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 				{
 					if(!GrandExchange.isOpen())
 					{
-						GrandExchange.open();
+						openGE();
 						continue;
 					}
 					if(putOffer)
@@ -2014,6 +2128,7 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 		//return as completed offer if none exist
 		return true;
 	}
+	
 	public static boolean isGEEmpty()
 	{
 		for(GrandExchangeItem i : GrandExchange.getItems())
@@ -2035,23 +2150,6 @@ public class ProfitableHerblore extends AbstractScript implements ChatListener, 
 		return false;
 	}
 	public static int initCoins = -1;
-	public static boolean checkedBank()
-	{
-		//return true;
-		if(Bank.getLastBankHistoryCacheTime() <= 0)
-		{
-			if(Bank.isOpen()) 
-			{
-				Bank.count(coins);
-			}
-			else clickBank();
-		}
-		if(Bank.getLastBankHistoryCacheTime() > 0)
-		{
-			return true;
-		}
-		return false;
-	}
 	private static final int coins = 995;
 	private static final int grimyGuam = 199;
 	private static final int guamUnf = 91;
